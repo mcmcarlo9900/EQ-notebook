@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>index_fixed_patch.html</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;line-height:1.6;padding:0 20px}
+pre{background:#f4f4f4;padding:16px;border-radius:8px;overflow:auto}
+code{font-family:monospace}
+</style>
+</head>
+<body>
+<h1>Syntax Fix for index.html</h1>
+<p>Your uploaded file has a syntax error in <code>doEarningsUpdate()</code>: an extra closing <code>)</code> after the <code>callProxy({...})</code> call.</p>
+<p>Replace:</p>
+<pre><code>        })
+      });</code></pre>
+<p>With:</p>
+<pre><code>        });</code></pre>
+<p>This is the specific parser-breaking issue identified from the uploaded file.</p>
+</body>
+</html>
