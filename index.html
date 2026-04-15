@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Research"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#040d1a"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230a1930'/%3E%3Ctext x='256' y='350' font-size='300' text-anchor='middle' fill='%2393c5fd' font-family='Georgia,serif' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"/>
+<title>Equity Research</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#f4f6f9;color:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;min-height:100dvh}
+input,textarea,select{font-size:16px!important;font-family:inherit}
+textarea{resize:vertical}
+::-webkit-scrollbar{display:none}
+button{cursor:pointer;border:none;background:none;color:inherit;font-family:inherit}
+button:disabled{opacity:.4;pointer-events:none}
+
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --surface2:#f0f4fa;
+  --navy:#0d2147; --mid:#1e3a6e; --nv:#2563eb;
+  --br:#3b82f6; --pl:#dbeafe; --pl2:#eff6ff;
+  --s3:#374151; --s4:#6b7280; --s5:#9ca3af; --s6:#d1d5db;
+  --ok-bg:#f0fdf4; --ok-bd:#86efac; --ok-t:#15803d;
+  --no-bg:#fef2f2; --no-bd:#fca5a5; --no-t:#dc2626;
+  --amber-bg:#fffbeb; --amber-bd:#fcd34d; --amber-t:#d97706;
+}
+
+.safe-top{padding-top:max(env(safe-area-inset-top),14px)}
+.safe-bot{padding-bottom:max(env(safe-area-inset-bottom),20px)}
+.safe-x{padding-left:max(env(safe-area-inset-left),16px);padding-right:max(env(safe-area-inset-right),16px)}
+
+.page{min-height:100dvh;background:var(--bg)}
+.top-bar{background:#fff;border-bottom:1px solid var(--s6);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.top-bar.sticky{position:sticky;top:0;z-index:10}
+
+.wrap{max-width:576px;margin:0 auto}
+.row{display:flex;align-items:center}
+.row.sb{justify-content:space-between}
+.row.gap{gap:8px}
+.row.base{align-items:baseline}
+.col{display:flex;flex-direction:column}
+.f1{flex:1}.ml-a{margin-left:auto}
+
+.stack{display:flex;flex-direction:column;gap:12px}
+.stack8{display:flex;flex-direction:column;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.card{background:#fff;border-radius:14px;border:1px solid var(--s6);overflow:hidden;transition:border-color .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card.upcoming{border-color:var(--br);border-style:dashed}
+.card-head{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;background:#f8faff;border-bottom:1px solid var(--s6)}
+.card-head.upcoming{background:var(--pl2)}
+.card-body{padding:12px 14px}
+
+.chip{background:var(--surface2);border:1px solid var(--s6);border-radius:8px;padding:9px 11px}
+.chip.ok{background:var(--ok-bg);border-color:var(--ok-bd)}
+.chip.no{background:var(--no-bg);border-color:var(--no-bd)}
+.chip .cl{font-size:10px;color:var(--s4);margin-bottom:3px;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.chip .cv{font-family:ui-monospace,monospace;font-size:13px;font-weight:700;line-height:1.2;color:var(--s3)}
+.chip.ok .cv{color:var(--ok-t)}
+.chip.no .cv{color:var(--no-t)}
+
+.rxn-tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px}
+.rxn-pos{background:var(--ok-bg);color:var(--ok-t);border:1px solid var(--ok-bd)}
+.rxn-neg{background:var(--no-bg);color:var(--no-t);border:1px solid var(--no-bd)}
+.rxn-neu{background:var(--pl2);color:var(--mid);border:1px solid var(--pl)}
+
+.btn{border-radius:9px;font-weight:700;transition:.15s;padding:9px 16px;font-size:13px}
+.btn.ac{background:var(--nv);color:#fff}
+.btn.ac:hover{background:var(--mid)}
+.btn.ghost{border:1px solid var(--s6);color:var(--s4);background:#fff}
+.btn.ghost:hover{border-color:var(--br);color:var(--nv)}
+.btn.sm{padding:6px 12px;font-size:12px;border-radius:7px}
+.btn.full{width:100%}
+.btn-icon{font-size:17px;padding:4px 7px;color:var(--s4);transition:.15s;border-radius:6px}
+.btn-icon:hover{color:var(--nv)}
+.btn-refresh{background:#fff;border:1px solid var(--s6);color:var(--nv);border-radius:7px;padding:5px 11px;font-size:12px;font-family:ui-monospace,monospace;transition:.15s}
+.btn-refresh:hover{border-color:var(--br)}
+.btn-expand{width:100%;padding-top:9px;margin-top:4px;border-top:1px solid var(--s6);font-size:11px;color:var(--s4);display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s;letter-spacing:.04em;text-transform:uppercase}
+.btn-expand:hover{color:var(--nv)}
+.btn-edit{background:#fff;border:1px solid var(--s6);color:var(--s4);border-radius:7px;padding:5px 11px;font-size:12px;transition:.15s;margin-top:12px}
+.btn-edit:hover{border-color:var(--br);color:var(--nv)}
+
+.inp{width:100%;background:#fff;border:1px solid var(--s6);color:var(--s3);border-radius:9px;padding:10px 12px;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--br);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.inp::placeholder{color:var(--s5)}
+.inp.area{resize:vertical}
+.lbl{font-size:11px;color:var(--s4);display:block;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.field{margin-bottom:12px}
+
+.note-lbl{font-size:10px;font-weight:700;color:var(--nv);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;opacity:.7}
+.note-txt{font-size:13px;color:var(--s3);line-height:1.7}
+.note-blk{margin-bottom:14px}
+
+/* thesis box */
+.thesis-card{background:#fff;border:1px solid var(--s6);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:4px}
+.thesis-head{padding:11px 14px;background:#f0f4fa;border-bottom:1px solid var(--s6);display:flex;align-items:center;justify-content:space-between}
+.thesis-label{font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.1em}
+.thesis-body{padding:14px;font-size:13px;color:var(--s3);line-height:1.75;white-space:pre-wrap}
+.thesis-body.empty{color:var(--s5);font-style:italic}
+.thesis-area{width:100%;background:#fff;border:none;color:var(--s3);padding:14px;font-size:13px;line-height:1.75;outline:none;resize:vertical;min-height:120px;font-family:inherit}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:600px){.overlay{align-items:center}}
+.sheet{background:#fff;border:1px solid var(--s6);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92dvh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,.1)}
+@media(min-width:600px){.sheet{border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15)}}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:17px 20px 12px;border-bottom:1px solid var(--s6)}
+.sheet-body{padding:16px 20px 28px}
+.sheet-close{font-size:22px;color:var(--s4);line-height:1;padding:2px 6px}
+.sheet-close:hover{color:var(--s3)}
+
+.ticker-card{background:#fff;border:1px solid var(--s6);border-radius:14px;padding:16px;text-align:left;width:100%;display:block;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ticker-card:hover{border-color:var(--br);box-shadow:0 2px 8px rgba(37,99,235,.1)}
+
+.brand-label{font-size:10px;color:var(--nv);letter-spacing:.18em;text-transform:uppercase;opacity:.6;margin-bottom:2px;font-family:ui-monospace,monospace}
+.brand-title{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.02em}
+.bc-back{font-size:13px;color:var(--nv);font-family:ui-monospace,monospace;letter-spacing:.04em}
+.bc-sep{color:var(--s6);font-size:14px;margin:0 4px}
+.bc-sym{font-size:14px;font-weight:700;color:var(--navy)}
+
+.live-price{font-family:ui-monospace,monospace;font-weight:700;font-size:19px;color:var(--navy)}
+.chg-pos{font-family:ui-monospace,monospace;font-size:13px;font-weight:700;color:var(--ok-t);margin-left:6px}
+.chg-neg{font-family:ui-monospace,monospace;font-size:13px;font-weight:700;color:var(--no-t);margin-left:6px}
+.live-sub{font-size:11px;color:var(--s4);margin-top:1px}
+
+.news-card{background:#fff;border:1px solid var(--s6);border-radius:12px;padding:13px 15px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.news-lbl{font-size:10px;color:var(--nv);letter-spacing:.18em;text-transform:uppercase;margin-bottom:9px;font-family:ui-monospace,monospace}
+.news-item{font-size:12px;color:var(--s3);padding:7px 0;border-bottom:1px solid var(--s6);line-height:1.55}
+.news-item:last-child{border-bottom:none}
+
+.notes-area{border-top:1px solid var(--s6);background:#fafbfd;padding:14px}
+
+.edit-area{width:100%;background:#fff;border:1px solid var(--s6);color:var(--s3);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.65;outline:none;transition:border-color .15s;font-family:inherit}
+.edit-area:focus{border-color:var(--br);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+
+.pulse{animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.fade{animation:fi .18s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.mt1{margin-top:4px}.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}
+.mb1{margin-bottom:4px}.mb2{margin-bottom:8px}.mb3{margin-bottom:12px}.mb4{margin-bottom:16px}
+.pt2{padding-top:8px}.pb3{padding-bottom:12px}
+.gap2{gap:8px}.gap3{gap:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect} = React;
+
+const SEED={
+  tickerOrder:["GOOGL","AMZN","MSFT","META","WMT","PLTR","RKLB","CRWV","NXT","FIG","DOCS","HIMS","NOW","TEAM","WDAY","ADBE"],
+  tickers:{
+    FIG:{company:"Figma Inc.",sector:"Software / Internet",exchange:"NASDAQ",quarters:[
+      {id:"fig-q2-fy25",label:"Q2 FY25",date:"Aug 2025",rev_est:232,rev_act:250,eps_est:0.05,eps_act:0.13,
+       metrics:[{l:"NDR ($10K+)",v:"129%"},{l:"Gross Margin",v:"90%"},{l:"Op Margin",v:"17%"}],
+       ah:"-13.7%",d1o:"~$102",d1c:"~$100",net:"~-13%",
+       pre:"Stock ~$120 post-IPO mania. Market pricing FIG as next-gen design monopoly. Lock-up expiration not fully discounted. AI concern not yet primary narrative. Expectations extremely elevated.",
+       said:"Revenue beat meaningfully (+7.8%). NDR 129% — healthy. Guidance in-line, not above. Lock-up unlock announced simultaneously. Nothing addressed AI displacement risk.",
+       why:"Fell 13.7% AH — not on earnings but on simultaneous lock-up unlock announcement. Insider supply shock overwhelmed strong results. Multiple de-rating began.",
+       upd:"Thesis unchanged — business executing. But monopoly premium started compressing. AI disruption narrative not yet dominant."},
+      {id:"fig-q3-fy25",label:"Q3 FY25",date:"Nov 5, 2025",rev_est:260,rev_act:274,eps_est:-1.58,eps_act:0.10,
+       metrics:[{l:"NDR ($10K+)",v:"131%"},{l:"Gross Margin",v:"86%"},{l:"Op Margin",v:"12%"}],
+       ah:"Flat",d1o:"~$36",d1c:"~$36",net:"~0%",
+       pre:"Stock $35-40 — down ~70% from ATH. AI disruption narrative dominant. Market pricing structural seat compression risk. Bears positioned.",
+       said:"Revenue beat again. NDR improved 129%→131%. Crossed $1B ARR. But nothing addressed whether AI would erode seat demand in 2-3 years.",
+       why:"Flat / -1%. Market not trading the quarter. AI structural question unanswered. Neither side got new information.",
+       upd:"De-rating stabilized but not reversed. Market in show-me mode — waiting for NDR data to show AI impact."},
+      {id:"fig-q4-fy25",label:"Q4 FY25",date:"Feb 18, 2026",rev_est:293,rev_act:304,eps_est:0.07,eps_act:0.08,
+       metrics:[{l:"NDR ($10K+)",v:"136% ↑"},{l:"Gross Margin",v:"86%"},{l:"2026 Guide",v:"$1.37B"}],
+       ah:"+15%",d1o:"~$24",d1c:"~$22",net:"~+5%",
+       pre:"Stock near $20-22, close to 52-week lows. Extreme AI disruption narrative. Multiple compressed toward distressed levels.",
+       said:"Revenue beat (+3.7%). NDR re-accelerated 131%→136%. 2026 guide $1.37B vs $1.29B est — 6% above consensus.",
+       why:"+15% AH. NDR acceleration was the specific signal bears needed to counter. Guide beat forced short covering.",
+       upd:"First quarter where data spoke to the structural question. NDR re-accelerating = AI not yet visible in seat economics."},
+      {id:"fig-q1-fy26",label:"Q1 FY26",date:"May 14, 2026",rev_est:316,rev_act:null,eps_est:0.07,eps_act:null,
+       metrics:[{l:"NDR ($10K+)",v:"TBD"},{l:"Gross Margin",v:"TBD"},{l:"AI Credit Rev",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,pre:"",said:"",why:"",upd:""}
+    ]},
+    HIMS:{company:"Hims & Hers Health Inc.",sector:"Consumer Telehealth",exchange:"NYSE",quarters:[
+      {id:"hims-q2-23",label:"Q2 2023",date:"Aug 2023",rev_est:194,rev_act:208,eps_est:-0.09,eps_act:-0.04,
+       metrics:[{l:"Subscribers",v:"1.27M"},{l:"EBITDA Margin",v:"~3%"},{l:"Short Interest",v:"~25%"}],
+       ah:"+5%",d1o:"~$7.50",d1c:"~$7.20",net:"~+3%",
+       pre:"Stock ~$6-7. SPAC hangover. Bears frame HIMS as promotional DTC brand with no moat — generic ED and hair loss pills with high CAC, no profitability, and no defensible IP. Consensus lazy short: shorting it requires no work, it just looks like a bad business.",
+       said:"Revenue $208M — beat. Subscribers growing fast. EBITDA turning less negative. Business is executing well by any operational metric. But guidance language is soft and no clear profitability timeline.",
+       why:"+5% small pop — short covering on the beat but no conviction re-rating. Bears didn't need to cover in size because the core thesis (no profits, no moat) wasn't addressed by the quarter.",
+       upd:"Revenue growth is undeniably real but the market still treats it as a promotional business that buys subscribers cheaply and loses them. The lazy short thesis is intact because nothing in the quarter proved durable unit economics."},
+      {id:"hims-q3-23",label:"Q3 2023",date:"Nov 2023",rev_est:217,rev_act:227,eps_est:-0.08,eps_act:-0.03,
+       metrics:[{l:"Subscribers",v:"1.34M"},{l:"EBITDA Margin",v:"~4%"},{l:"Short Interest",v:"~25%"}],
+       ah:"+8%",d1o:"~$8.80",d1c:"~$8.60",net:"~+5%",
+       pre:"Stock ~$8-9. Some incremental bulls building positions on the growth trajectory. Short interest still elevated. Bears pointing to skin care losses and lack of operating leverage. Market treating HIMS as a promotional engine not a healthcare platform.",
+       said:"Revenue $227M +39% YoY — beat. EBITDA losses narrowing meaningfully. Subscriber growth accelerating. Hair loss and sexual health scaling. Guidance raised for Q4. First signals of operating leverage actually appearing.",
+       why:"+8% AH — better short covering but still no re-rating. Shorts not rushing to cover because the profitability milestone hasn't been crossed yet. Market waiting for proof, not just trajectory.",
+       upd:"Narrative shifting at the margin — this is no longer a business losing money at scale, it's a business approaching profitability at scale. But the market needs the milestone, not the direction."},
+      {id:"hims-q4-23",label:"Q4 2023",date:"Feb 26, 2024",rev_est:235,rev_act:247,eps_est:-0.02,eps_act:0.01,
+       metrics:[{l:"Subscribers",v:"1.5M (+48%)"},{l:"EBITDA Margin",v:"8.4%"},{l:"2024 Guide",v:"$1.17-1.20B"}],
+       ah:"+31%",d1o:"~$13.50",d1c:"~$13.20",net:"~+28%",
+       pre:"Stock ~$9-10. EBITDA profitability expected but timing uncertain. Market still skeptical on durability. Weight loss verticals mentioned but not yet a financial contributor. Short interest still elevated ~25%.",
+       said:"Revenue $247M +47% YoY — beat. First GAAP net income ($1.2M). EBITDA $20.6M at 8.4% margin — first Q4 profitability milestone. 2024 guide $1.17-1.20B — massive raise. CEO flagged weight loss, derm, mental health each heading toward $100M+ in 2025.",
+       why:"+31% — largest single-day move since IPO. Two things happened simultaneously: (1) the lazy-short thesis was mathematically broken — a profitable, fast-growing business can't be shorted on 'no moat' grounds alone; (2) the 2024 guide implied a fundamentally different scale than bears modeled. Mass short covering.",
+       upd:"Phase change. The market re-classifies HIMS from 'promotional DTC brand' to 'profitable growth platform.' Consensus upgrades across the board. Multiple re-rates from 1x to 3-4x forward revenue. Bears forced to rebuild thesis from scratch."},
+      {id:"hims-q2-24",label:"Q2 2024",date:"Aug 2024",rev_est:295,rev_act:316,eps_est:0.07,eps_act:0.19,
+       metrics:[{l:"Subscribers",v:"1.9M (+47%)"},{l:"Weight Loss Rev",v:"$100M+ run rate"},{l:"GLP-1 Launch",v:"May 2024"}],
+       ah:"+20%",d1o:"~$22",d1c:"~$21",net:"~+18%",
+       pre:"Stock ~$16-18. GLP-1 launch in May 2024 is now in the numbers. Market beginning to price HIMS as a GLP-1 distribution play. Bulls see a massive TAM expansion. Bears scrambling — the original lazy-short thesis is dead.",
+       said:"Revenue $316M +50% YoY — beat. EPS $0.19 vs $0.07 est — massive beat. Weight loss vertical scaling fast with compounded semaglutide at $199/mo vs $1000+ branded. Subscribers growing to 1.9M. The GLP-1 inflection is real and in the numbers.",
+       why:"+20% AH. The GLP-1 opportunity is now quantified. HIMS is selling compounded semaglutide at a price point that branded pharma can't match during a supply shortage. Market reprices the total addressable market dramatically upward.",
+       upd:"Second re-rating — this time driven by a fundamentally new business line. GLP-1 transforms HIMS from a hair/ED/derm platform into a weight loss company. Bears now short on regulatory risk (FDA shortage classification) rather than business quality."},
+      {id:"hims-q3-24",label:"Q3 2024",date:"Nov 2024",rev_est:370,rev_act:402,eps_est:0.12,eps_act:0.45,
+       metrics:[{l:"Subscribers",v:"2.2M"},{l:"Weight Loss Rev",v:"~35% of total"},{l:"EBITDA Margin",v:"13%"}],
+       ah:"+30%",d1o:"~$28",d1c:"~$30",net:"~+28%",
+       pre:"Stock ~$22-25. GLP-1 momentum is the primary narrative. Short interest declining as bears capitulate. Bulls pricing HIMS as the dominant low-cost GLP-1 distribution platform with a structural advantage vs Novo Nordisk/Lilly on price and access.",
+       said:"Revenue $402M +52% YoY — significant beat. EPS $0.45 vs $0.12 est — blowout. Weight loss now ~35% of revenue and scaling. EBITDA 13% and expanding. Every metric ahead of expectations. Stock at ~$30 — near 52-week highs.",
+       why:"+30% AH. Peak GLP-1 optimism. The market is pricing HIMS as if compounded semaglutide is a permanent franchise. Short interest collapse + retail FOMO amplify the move. Stock approaches ATH territory.",
+       upd:"Third re-rating — this time based on GLP-1 revenue actually showing up at scale. Market consensus shifts to 'HIMS is a healthcare platform with structural pricing advantage over branded GLP-1.' Bears are now a small minority. The new risk is regulatory, not fundamental."},
+      {id:"hims-q4-24",label:"Q4 2024",date:"Feb 24, 2025",rev_est:455,rev_act:481,eps_est:0.18,eps_act:0.22,
+       metrics:[{l:"Subscribers",v:"2.2M (+45%)"},{l:"2025 Guide",v:"$2.3-2.4B"},{l:"FDA Event",v:"Shortage resolved Feb 21"}],
+       ah:"-19%",d1o:"~$38",d1c:"~$36",net:"~-45% from ATH",
+       pre:"Stock had hit ATH ~$66 on Jan/Feb 2025. Massive retail and institutional long positions. Market pricing compounded GLP-1 as a permanent revenue stream. Feb 21 — FDA announces semaglutide shortage RESOLVED → stock -26% that Friday before earnings.",
+       said:"Revenue $481M +95% YoY — beat. EPS $0.22 — beat. 2025 guide $2.3-2.4B — strong. But FDA shortage resolution changes the regulatory calculus: compounders can only mass-produce 'essentially copies' when shortage is active. Compounding window theoretically closing.",
+       why:"-19% AH despite beating everything. FDA had already taken -26% off two days earlier. Market re-pricing the GLP-1 runway from 'permanent' to 'temporary.' The question is no longer about revenue, it's about whether compounded semaglutide is legal in 6 months.",
+       upd:"Fourth re-rating — this time downward. GLP-1 revenue is real but the shelf life is now uncertain. Market shifts from pricing permanent franchise to pricing a time-limited arbitrage. Bull thesis narrows to: (1) personalization argument extends runway; (2) platform diversification absorbs GLP-1 loss; (3) branded partnership deals emerge."},
+      {id:"hims-q1-25",label:"Q1 2025",date:"May 7, 2025",rev_est:480,rev_act:535,eps_est:0.17,eps_act:0.24,
+       metrics:[{l:"Subscribers",v:"2.4M"},{l:"Short Interest",v:"~30%"},{l:"Personalized Sema",v:"Active"}],
+       ah:"-19%",d1o:"~$26",d1c:"~$22",net:"~-22%",
+       pre:"Stock ~$25-28. Short interest back up to 30%+ as bears re-engage on regulatory risk. Bull thesis is 'personalization argument extends compounding runway past shortage resolution.' FDA enforcement discretion window ongoing.",
+       said:"Revenue $535M — massive beat. EPS $0.24 beat. Subscriber growth strong. HIMS arguing personalized compounding (custom doses + additives) is legally distinct from 'essentially a copy.' Business growing faster than anyone modeled, even with regulatory overhang.",
+       why:"-19% AH despite enormous beat. Market doesn't believe the revenue is durable — each dollar of compounded semaglutide revenue is now discounted by the probability of FDA enforcement action shutting it down. Good quarter ≠ durable business.",
+       upd:"The market is now explicitly trading regulatory probability, not revenue. A 535M quarter that beats by 10%+ falls 19% because investors are pricing the binary: either compounding survives and HIMS is $40+, or it doesn't and HIMS is $10-12."},
+      {id:"hims-q3-25",label:"Q3 2025",date:"Nov 3, 2025",rev_est:550,rev_act:599,eps_est:0.14,eps_act:0.18,
+       metrics:[{l:"Subscribers",v:"2.47M (+21%)"},{l:"EBITDA Margin",v:"13%"},{l:"FDA Warning",v:"Sep 2025 letter"}],
+       ah:"+12%",d1o:"~$35",d1c:"~$34",net:"~+10%",
+       pre:"Stock ~$28-32. FDA warning letter issued Sep 2025 re: misleading GLP-1 ad claims. Market partially pricing enforcement risk. Some bears covering as company demonstrates business durability beyond GLP-1.",
+       said:"Revenue $599M +49% YoY — beat. EBITDA $78M 13% margin. Full year guided $2.335-2.355B. Subscriber growth moderating (+21% vs prior 45%+) as GLP-1 onboarding slows. Non-GLP-1 verticals (derm, mental health, sexual health) showing real scale.",
+       why:"+12% AH. Market begins to distinguish HIMS-as-GLP-1-play from HIMS-as-platform-with-GLP-1. Durability of hair loss, derm, mental health business provides a floor. Short covering as platform thesis gains credibility.",
+       upd:"Narrative maturing: HIMS is no longer a pure GLP-1 trade — it's a diversified consumer health platform where GLP-1 is an important but not existential revenue line. Bulls cite 96% multi-month subscriber rate as quality signal. Regulatory risk repriced from 'existential' to 'meaningful headwind.'"},
+      {id:"hims-q4-25",label:"Q4 2025",date:"Feb 23, 2026",rev_est:615,rev_act:638,eps_est:0.05,eps_act:0.08,
+       metrics:[{l:"FY2025 Rev",v:"$2.35B (+59%)"},{l:"2026 Guide",v:"$2.7-2.9B"},{l:"SEC Investigation",v:"Disclosed"}],
+       ah:"-9%",d1o:"~$19",d1c:"~$18",net:"~-12%",
+       pre:"Stock ~$18-20. Short interest record ~37%. Oral GLP-1 pill forced withdrawal Feb 2026 (FDA: unapproved copycat). Eucalyptus acquisition $1.15B announced. SEC investigation into compounded semaglutide disclosures disclosed. Market in maximum uncertainty mode.",
+       said:"Revenue $638M Q4, $2.35B FY2025 — beat. 2026 guide $2.7-2.9B — strong. Subscribers 2.5M. EBITDA $307-317M guided 2025. But SEC investigation is new negative. Oral pill withdrawal is another negative. CEO says weight business is 'durable even without compounded GLP-1.'",
+       why:"-9% despite beat. SEC investigation creates a new layer of legal risk on top of FDA regulatory risk. Market can't assign a probability to the SEC outcome. Two new risks in one month (oral pill + SEC) overwhelm a solid earnings beat.",
+       upd:"Maximum uncertainty. The stock is pricing in a significant probability of compounded semaglutide being shut down AND potential SEC enforcement. At ~$18, HIMS is trading at 2x forward revenue — pricing meaningful probability of GLP-1 loss. The debate is now: is the non-GLP-1 platform worth $10B standalone?"},
+      {id:"hims-q1-26",label:"Q1 2026",date:"May 2026",rev_est:620,rev_act:null,eps_est:0.10,eps_act:null,
+       metrics:[{l:"GLP-1 Status",v:"TBD post-truce"},{l:"Subscribers",v:"TBD"},{l:"SEC Update",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,
+       pre:"Mar 2026: stock +40% on GLP-1 truce/deal news. Current ~$21. Short interest still elevated ~30%. Key question: did the March rally price in too much optimism or is the compounding runway genuinely extended?",
+       said:"Update after earnings",why:"Update after earnings",upd:"Update after earnings"}
+    ]},
+    NOW:{company:"ServiceNow Inc.",sector:"Enterprise AI / Workflow",exchange:"NYSE",quarters:[
+      {id:"now-q2-25",label:"Q2 2025",date:"Jul 23, 2025",rev_est:3150,rev_act:3215,eps_est:0.84,eps_act:0.90,
+       metrics:[{l:"Sub Rev",v:"$3.11B +22.5%"},{l:"cRPO",v:"$10.92B +24.5%"},{l:"Now Assist ACV",v:"Stepping up"}],
+       ah:"+6%",d1o:"~$920",d1c:"~$910",net:"~+5%",
+       pre:"Stock ~$850-900. Market pricing NOW as the clearest enterprise AI beneficiary — workflow automation is the highest-ROI AI use case and NOW owns the infrastructure layer. Expectations elevated. Now Assist (AI product) traction being watched closely for revenue contribution.",
+       said:"Rev $3.22B +21.5% CC — beat. cRPO $10.92B +24.5% CC — 200bps above guidance. Now Assist NNACV stepping up. Beat+raise on full-year guide to $12.78-12.80B. Federal business executed well despite macro noise. AI Control Tower gaining traction.",
+       why:"+6% AH. Clean beat-and-raise with cRPO acceleration as the forward signal. Market reads cRPO outperformance as AI demand pulling forward contract duration — the bulls' key thesis confirmed. Federal execution despite DOGE uncertainty removed a bear concern.",
+       upd:"AI narrative fully intact. NOW is executing the transition from workflow platform to AI platform credibly — Now Assist is generating real NNACV. The bar gets higher with each beat. Valuation premium sustained but increasingly priced for perfection."},
+      {id:"now-q3-25",label:"Q3 2025",date:"Oct 29, 2025",rev_est:3270,rev_act:3340,eps_est:0.87,eps_act:0.95,
+       metrics:[{l:"Sub Rev",v:"$3.30B +21.5%"},{l:"AI Control Tower",v:"4x seq. growth"},{l:"5-for-1 Split",v:"Dec 5, 2025"}],
+       ah:"+8%",d1o:"~$985",d1c:"~$970",net:"~+6%",
+       pre:"Stock ~$900-940. Peak AI platform optimism. Now Assist in every major pitch. Market consensus that NOW is the enterprise AI workflow winner. Full-year guide raised twice — street scrambling to catch up to the actual trajectory.",
+       said:"Sub rev $3.30B — beat. AI Control Tower NNACV grew 4x sequentially. ITSM/HR+ NNACV doubled QoQ. AI Control Tower in 16 of top 20 deals. 97% renewal rate. 5-for-1 stock split announced for Dec 5. Guidance raised again — full year now $12.78-12.80B.",
+       why:"+8% AH. AI product metrics were not just anecdotal — the 4x sequential AI Control Tower growth is quantifiable evidence of enterprise AI adoption translating into revenue. Stock split framing creates retail enthusiasm. Best pure AI execution quarter yet.",
+       upd:"Peak thesis confirmation quarter. The market now prices NOW as the primary enterprise AI infrastructure play. Multiple elevated to 15-18x forward revenue. The risk is no longer 'will AI work for NOW' — it's 'is the acceleration sustainable at scale or is this early-adopter pull-forward?'"},
+      {id:"now-q4-25",label:"Q4 2025",date:"Jan 28, 2026",rev_est:3530,rev_act:3570,eps_est:0.89,eps_act:0.92,
+       metrics:[{l:"Sub Rev",v:"$3.47B +21%"},{l:"$1M+ ACV deals",v:"244 (+40% YoY)"},{l:"$5B Buyback",v:"Authorized"}],
+       ah:"-11%",d1o:"~$126",d1c:"~$120",net:"~-13%",
+       pre:"Stock ~$130-135 (post-split). Bar extremely high after three consecutive beat-and-raise quarters. Federal headwinds (government shutdown impact), on-prem transition timing, and slight cRPO guide concern flagged by some analysts pre-earnings.",
+       said:"Rev $3.57B +20.7% — beat. EPS $0.92 vs $0.89 — beat. $5B buyback authorized. 2026 subscription guide $15.53-15.57B implies 19.5-20% growth. RaptorDB tripled NNACV. 244 $1M+ ACV deals +40% YoY. But cRPO guide slightly below elevated expectations. Federal business cited as headwind.",
+       why:"-11% AH despite beating both EPS and revenue. The 2026 guide (19.5-20%) was inline with prior trajectory but below the elevated expectations some bulls had modeled. Federal headwind acknowledged. Market at peak multiple has zero tolerance for anything below beat-and-raise. Classic 'sell the news at perfection-priced multiple.'",
+       upd:"Not a thesis break — a valuation adjustment. 19-20% growth for a $60B ARR business remains exceptional. But at 15-17x forward revenue the market was pricing 22%+ sustained. The re-rating is multiple compression, not fundamental deterioration. Next quarter (Apr 22) will test whether federal recovers and cRPO reaccelerates."},
+      {id:"now-q1-26",label:"Q1 2026",date:"Apr 22, 2026",rev_est:3650,rev_act:null,eps_est:0.80,eps_act:null,
+       metrics:[{l:"cRPO Growth",v:"TBD"},{l:"Federal Recovery",v:"TBD"},{l:"Now Assist ACV",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,pre:"",said:"",why:"",upd:""}
+    ]},
+    TEAM:{company:"Atlassian Corporation",sector:"Developer Collaboration",exchange:"NASDAQ",quarters:[
+      {id:"team-q4-fy25",label:"Q4 FY25",date:"Aug 7, 2025",rev_est:1340,rev_act:1384,eps_est:0.85,eps_act:1.00,
+       metrics:[{l:"Cloud Rev",v:"$928M +26%"},{l:"RPO",v:"$3.1B +40%"},{l:"Non-GAAP Op Mgn",v:"27%"}],
+       ah:"+6%",d1o:"~$215",d1c:"~$208",net:"~+4%",
+       pre:"Stock ~$200-215. AI disruption narrative building but not yet dominant. Market acknowledging Rovo (TEAM's AI product) is real. Atlassian System of Work narrative gaining traction. 52-week high ~$242. Multiple elevated relative to growth rate.",
+       said:"Rev $1.38B +22% — beat. Cloud +26%. RPO +40% — strong forward indicator. Non-GAAP op margin 27% expanding. FY2025 guide raised to 18.5-19% growth. Rovo AI assistant showing engagement. Enterprise migration from on-prem to cloud accelerating.",
+       why:"+6% AH — healthy beat drove short covering. Cloud acceleration (+26%) and RPO strength offset concerns about macro. AI product (Rovo) framed as a growth driver not a threat. At $200+ the multiple was demanding but earnings cleared the bar.",
+       upd:"Positive quarter at an elevated multiple. Bears running the 'AI coding tools replace Jira' thesis but it's not showing up in cloud revenue yet. RPO +40% means next 12 months' revenue is well-covered. The structural AI concern is 2-3 years out and hasn't materialized."},
+      {id:"team-q1-fy26",label:"Q1 FY26",date:"Nov 6, 2025",rev_est:1380,rev_act:1433,eps_est:0.92,eps_act:1.10,
+       metrics:[{l:"Cloud Rev",v:"$998M +26%"},{l:"RPO",v:"$3.3B +42%"},{l:"DX Acquisition",v:"Closed Nov 10"}],
+       ah:"Flat/+2%",d1o:"~$165",d1c:"~$162",net:"~-5% vs pre",
+       pre:"Stock ~$160-175. AI disruption narrative now fully active. Cursor, GitHub Copilot, Claude Code all cited in bear thesis. Stock down ~30% from ATH. Shorts rebuilding positions on developer workflow disruption. The key question: will AI-native dev tools make Jira optional?",
+       said:"Rev $1.43B +21% — beat. Cloud +26% — consistent. RPO +42% — accelerating. DX acquisition closed (engineering intelligence). Non-GAAP margin expanding. But revenue growth decelerated slightly from 22% to 21%. AI adoption internally accelerating but not directly countering the displacement narrative.",
+       why:"Flat/+2% — small pop on the beat then fade. The good revenue numbers don't address whether AI-native development tools will restructure workflows in 2027-2028. Market not trading the quarter. Same FIG pattern: good quarter, structural question unanswered, price goes nowhere.",
+       upd:"Pattern established: beats don't re-rate. Stock needs evidence that Jira/Confluence are embedded in AI-native workflows, not just legacy workflows. DX acquisition (developer productivity measurement) is interesting but markets won't credit it until it shows up in net expansion."},
+      {id:"team-q2-fy26",label:"Q2 FY26",date:"Feb 5, 2026",rev_est:1540,rev_act:1586,eps_est:1.15,eps_act:1.22,
+       metrics:[{l:"Cloud Rev",v:"$1.07B +26%"},{l:"RPO",v:"$3.81B +44%"},{l:"Non-GAAP Op Mgn",v:"27%"}],
+       ah:"+4%",d1o:"~$70",d1c:"~$68",net:"~-2% vs pre",
+       pre:"Stock ~$65-70. Down ~70% from ATH $242. Multiple compressed to 4-5x forward revenue — near distressed territory for a 20%+ grower. The AI coding disruption thesis fully priced in. Bears dominant. Bull case requires evidence AI tools expand rather than contract developer seat demand.",
+       said:"Rev $1.59B +23% — beat by 3%. EPS $1.22 vs $1.15 (+6.5%). Cloud +26%. RPO $3.81B +44% — strong. Non-GAAP margin 27%. Revenue reaccelerated from 21% to 23% — a positive surprise. Rovo AI usage metrics disclosed for first time.",
+       why:"+4% initial AH then fade back to near flat. At distressed multiples, a beat has modest leverage upward. But the RPO acceleration and margin expansion provide no new information about whether AI agents will make Jira redundant in 2028. Pattern unchanged: good quarter, structural concern intact, fade follows the pop.",
+       upd:"The 70% decline from ATH has already done the re-rating. At 4-5x revenue the stock is not pricing in continued 20%+ growth — it's pricing in deceleration. The question for the next cycle: does AI actually show up in seat churn, or does Atlassian successfully embed itself into AI-native dev workflows through Rovo?"},
+      {id:"team-q3-fy26",label:"Q3 FY26",date:"Apr 30, 2026",rev_est:1650,rev_act:null,eps_est:1.33,eps_act:null,
+       metrics:[{l:"Cloud Rev",v:"TBD"},{l:"RPO Growth",v:"TBD"},{l:"Rovo AI Users",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,pre:"",said:"",why:"",upd:""}
+    ]},
+    WDAY:{company:"Workday Inc.",sector:"Enterprise HR / Finance",exchange:"NASDAQ",quarters:[
+      {id:"wday-q1-fy26",label:"Q1 FY26",date:"May 22, 2025",rev_est:2200,rev_act:2240,eps_est:1.74,eps_act:2.23,
+       metrics:[{l:"Sub Rev Backlog",v:"$7.63B +15.6%"},{l:"Non-GAAP Op Mgn",v:"30.2%"},{l:"AI Features",v:"70+ live"}],
+       ah:"+5%",d1o:"~$242",d1c:"~$238",net:"~+3%",
+       pre:"Stock ~$230-240. Eschenbach's efficiency mandate showing in margins. AI Illuminate architecture announced — positioning WDAY as 'managing people, money, AND agents.' Bears worry AI reduces headcount at WDAY's customers, shrinking the seat expansion model. Stock down ~15% from prior highs.",
+       said:"Rev $2.24B +12.6% — beat. EPS $2.23 vs $1.74 est — large beat driven by margin discipline. Sub backlog +15.6%. HiredScore (AI hiring) integration measurably improving customer outcomes: 40% increase in internal applications, 70%+ boost in invoice processing. Eighth consecutive beat.",
+       why:"+5% AH. The EPS beat was significant (28% above estimate) driven by margin expansion. Investors rewarding the cost discipline pivot even as growth moderates. AI features showing ROI for customers — a counter to the bear case that AI reduces headcount expansion.",
+       upd:"Margin story working. The transition from pure growth to profitable growth is executing. But at 12-13% revenue growth the AI disruption bear case (fewer employees = fewer WDAY seats) is a slower-moving threat. Market treating WDAY as a quality compounder with manageable AI risk."},
+      {id:"wday-q2-fy26",label:"Q2 FY26",date:"Aug 21, 2025",rev_est:2310,rev_act:2348,eps_est:2.12,eps_act:2.21,
+       metrics:[{l:"Sub Rev",v:"$2.17B +14%"},{l:"Total Sub Backlog",v:"$25.37B +17.6%"},{l:"Non-GAAP Op Mgn",v:"29%"}],
+       ah:"+3%",d1o:"~$225",d1c:"~$222",net:"~+2%",
+       pre:"Stock ~$215-225. Macro headwinds: EMEA deal scrutiny elevated. Management flagged moderated customer headcount growth in prior call — this is the canary in the AI disruption coal mine. Bears watching for the first sign that headcount contraction hurts WDAY net expansion.",
+       said:"Rev $2.35B +12.6% — beat. EPS $2.21 vs $2.12 — beat. Sub backlog $25.37B +17.6% — strong. Non-GAAP margin 29% expanding. Closed two largest EMEA deals ever (both partner-sourced). 70+ AI features live. Extend platform new ACV +75%. Deal scrutiny persisted but execution held.",
+       why:"+3% small pop. The EMEA execution despite scrutiny was the key upside. However, growth deceleration (12% vs 16%+ in 2023-2024) combined with customer headcount growth moderating creates a ceiling on the upside. Market rewards execution but doesn't re-rate.",
+       upd:"Consistent execution in a decelerating environment. The AI narrative for WDAY is nuanced — AI tools inside Workday improve outcomes for existing customers (retention) while the macro concern is AI reducing the total addressable HR seat market. Neither trend is decisive yet."},
+      {id:"wday-q3-fy26",label:"Q3 FY26",date:"Nov 25, 2025",rev_est:2400,rev_act:2432,eps_est:2.28,eps_act:2.35,
+       metrics:[{l:"Sub Rev",v:"$2.24B +14.6%"},{l:"Non-GAAP Op Mgn",v:"28.5%"},{l:"FCF",v:"$550M"}],
+       ah:"+4%",d1o:"~$220",d1c:"~$218",net:"~+3%",
+       pre:"Stock ~$210-215. Three consecutive beats but stock has drifted down 17% over the year. Market skeptical that 12-13% growth justifies the multiple even with margin expansion. Aneel Bhusri (co-founder) rumored to be more involved again.",
+       said:"Rev $2.43B +12.6% — beat. Sub rev +14.6% — slight acceleration. Non-GAAP margin 28.5% — up significantly from 24% two years ago. FCF $550M healthy. AI agents (Workday Illuminate) now featured in enterprise pitches. Ninth consecutive beat.",
+       why:"+4% AH. Sub revenue reacceleration to 14.6% vs 12.6% total was the key signal — it implies the backlog quality is improving. Margin story intact. But at 5-6x forward revenue with 12-13% growth, the re-rating requires either acceleration or proof that agentic AI opens a new expansion vector.",
+       upd:"The margin thesis is working but not driving re-rating. WDAY is becoming a quality cash compounder rather than a growth story. The Bhusri return (announced Q4) suggests the board wants to reaccelerate growth — the agentic AI 'managing people, money, and agents' positioning is the vehicle for that attempt."},
+      {id:"wday-q4-fy26",label:"Q4 FY26",date:"Mar 2026",rev_est:2470,rev_act:2476,eps_est:2.32,eps_act:2.47,
+       metrics:[{l:"FY26 Rev",v:"$9.55B +13.1%"},{l:"FY27 Sub Guide",v:"$9.93-9.95B +12-13%"},{l:"CEO Change",v:"Bhusri returns"}],
+       ah:"+5%",d1o:"~$235",d1c:"~$228",net:"~+3%",
+       pre:"Stock ~$225. Aneel Bhusri returned as CEO mid-quarter. Signals the board wanted a reset. Eschenbach's efficiency mandate had worked on margins but growth not reaccelerating sufficiently. Market uncertain whether Bhusri return is bullish (visionary back) or bearish (Eschenbach pushed out).",
+       said:"Rev $2.48B — beat. EPS $2.47 vs $2.32 — beat. FY2026 total $9.55B +13.1%. FY2027 sub guide $9.93-9.95B implies 12-13% — no acceleration. Bhusri framing: 'we're prioritizing investment in agentic AI to capture a larger market.' Sovereign Cloud launched for EU data residency.",
+       why:"+5% AH — CEO return resolved uncertainty, EPS beat was meaningful, and the buyback commitment supported the stock. However FY2027 guide of 12-13% growth confirmed that the acceleration thesis is not in the near-term numbers — it's in the agentic AI bet Bhusri is making.",
+       upd:"Regime change. Eschenbach era: margin efficiency + consistent beats + modest growth. Bhusri era: agentic AI expansion play + willingness to invest ahead of revenue. The market will re-rate WDAY upward if Workday Agents (HR and Finance agents) show real NNACV in the next 2-3 quarters."}
+    ]},
+    ADBE:{company:"Adobe Inc.",sector:"Creative / Digital Experience",exchange:"NASDAQ",quarters:[
+      {id:"adbe-q2-fy25",label:"Q2 FY25",date:"Jun 13, 2025",rev_est:5820,rev_act:5870,eps_est:4.97,eps_act:5.06,
+       metrics:[{l:"Firefly Generations",v:"24B+ total"},{l:"Firefly App Subs",v:"~2x seq."},{l:"AI Direct ARR",v:">$250M target on track"}],
+       ah:"+5%",d1o:"~$275",d1c:"~$272",net:"~+4%",
+       pre:"Stock ~$260-275. Deeply depressed vs ATH ~$700. Market at peak AI disruption fear for creative software: Midjourney, Sora, Runway, DALL-E all cited as Creative Cloud substitutes. Bears argue AI reduces the need for professional design skills → seat compression. At 12x forward EPS — decade lows.",
+       said:"Rev $5.87B +11% — beat. EPS $5.06 vs $4.97 — beat. Firefly app paid subs nearly doubled sequentially. 24B+ total Firefly generations. Digital Experience +9% YoY. Raised full-year guide to $23.50-23.60B. Acrobat AI Assistant engagement growing. AI monetization credits model beginning to scale.",
+       why:"+5% AH. The Firefly metrics reframed the narrative from 'AI is threatening Adobe' to 'AI is Adobe's next monetization layer.' Paid Firefly subscriptions doubling sequentially is the first evidence that Adobe is capturing AI demand rather than being disrupted by it. Guidance raise validates the thesis.",
+       upd:"Narrative shift beginning. Bears focused on long-term seat compression; bulls focused on near-term AI credit monetization. The Firefly data supports the bull case that creative professionals use more Adobe, not less, when AI tools are embedded in existing workflows. $250M AI ARR target on track."},
+      {id:"adbe-q3-fy25",label:"Q3 FY25",date:"Sep 17, 2025",rev_est:5880,rev_act:5990,eps_est:5.10,eps_act:5.31,
+       metrics:[{l:"Digital Media ARR",v:"$18.5B +11%"},{l:"Firefly Traffic",v:"+30% QoQ"},{l:"AI Direct ARR",v:"On track >$250M"}],
+       ah:"+7%",d1o:"~$295",d1c:"~$292",net:"~+6%",
+       pre:"Stock ~$270-280. Post-Q2 optimism partially restored. Market partially recalibrated on Firefly monetization potential. But CEO Narayen retirement announced — creates management uncertainty. Bears still cite competitive pressure from native AI image tools.",
+       said:"Rev $5.99B +11% — beat. EPS $5.31 vs $5.10 — beat. Firefly traffic +30% QoQ. Digital Experience subscription +11%. Guidance raised again: FY25 now $23.65-23.70B. AI credits model showing increasing attach in enterprise deals. $250M AI direct ARR target confirmed on track.",
+       why:"+7% AH. Two consecutive guide-raises on AI monetization removes the bear case that Firefly is a defensive tool rather than a revenue driver. The 30% traffic growth sequentially shows user engagement compounding. CEO succession announced with 'AI-native leader' framing — market reads as transition risk but manageable.",
+       upd:"Second consecutive AI monetization validation quarter. The pattern: each quarter the bull case gets a little more quantified (Firefly subs, traffic, AI ARR) and the bear case (seat compression) remains a future possibility rather than a current reality. Multiple re-rating from 12x to 15x forward earnings."},
+      {id:"adbe-q4-fy25",label:"Q4 FY25",date:"Dec 10, 2025",rev_est:6100,rev_act:6190,eps_est:5.40,eps_act:5.50,
+       metrics:[{l:"FY25 Rev",v:"$23.8B +11%"},{l:"Total ARR",v:"$25.2B +11.5%"},{l:"FCF",v:">$10B FY25"}],
+       ah:"+4%",d1o:"~$315",d1c:"~$308",net:"~+3%",
+       pre:"Stock ~$300-310. Three consecutive guide-raises. AI monetization narrative well-established. CEO succession still TBD. Bears diminished but not gone — the long-term seat compression thesis requires 2027+ data to test. Multiple recovering toward 16-17x forward EPS.",
+       said:"Rev $6.19B +10% — beat. EPS $5.50 — beat. Record FY2025 $23.8B. Total ARR $25.2B +11.5%. FCF >$10B for FY25 — record. FY2026 ARR growth targeted >10%. Narayen frames Adobe's 'growing importance in the global AI ecosystem.' AI credit model now a recognized revenue line.",
+       why:"+4% AH. Record results validate the full-year narrative. However the reaction is modest because three beats have already partially re-rated the stock. The new baseline is 10-11% growth with AI credits as the incremental driver — not a re-rating catalyst but a confirmation one.",
+       upd:"Full-year narrative complete. Adobe has successfully reframed from 'AI disruption victim' to 'AI monetization beneficiary' in the market's view. The next test: does the CEO transition go cleanly? And does 10-11% growth accelerate toward 13-14% as AI credits scale — or does it decelerate as seat saturation kicks in?"},
+      {id:"adbe-q1-fy26",label:"Q1 FY26",date:"Mar 2026",rev_est:6300,rev_act:null,eps_est:5.60,eps_act:null,
+       metrics:[{l:"AI Credit Rev",v:"TBD"},{l:"New CEO",v:"TBD"},{l:"FY26 Guide",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,
+       pre:"CEO successor named/TBD. Stock ~$290-310. Key question: does new leadership confirm or change the AI monetization roadmap?",
+       said:"Update after earnings",why:"Update after earnings",upd:"Update after earnings"}
+    ]},
+    GOOGL:{company:"Alphabet Inc.",sector:"Mega-Cap Tech / AI",exchange:"NASDAQ",quarters:[
+      {id:"googl-q1-24",label:"Q1 2024",date:"Apr 25, 2024",rev_est:78900,rev_act:80500,eps_est:1.51,eps_act:1.89,
+       metrics:[{l:"Google Cloud",v:"$9.4B +28%"},{l:"Op Margin",v:"31.6%"},{l:"YouTube Ads",v:"$8.1B +21%"}],
+       ah:"+10%",d1o:"~$176",d1c:"~$172",net:"~+8%",
+       pre:"Stock ~$160. Cloud re-acceleration thesis building. AI Overviews in Search generating investor debate: is it additive or cannibalizing ad clicks? Bears cite AI search disruption risk. Multiple compressed vs peak.",
+       said:"Rev $80.5B +15% — beat. Cloud $9.4B +28% — acceleration. Op margin 31.6% — 500bps expansion. YouTube +21%. AI Overviews live in US. Capex guide raised to $12B/Q.",
+       why:"+10% AH. Cloud acceleration + margin expansion simultaneously demolished both bear cases. Market re-rates GOOGL as AI beneficiary, not victim.",
+       upd:"Narrative flips. GOOGL is no longer 'disrupted by AI' — it's running its own AI transition at scale. Cloud + Search AI a powerful combination."},
+      {id:"googl-q2-24",label:"Q2 2024",date:"Jul 23, 2024",rev_est:84200,rev_act:84700,eps_est:1.84,eps_act:1.89,
+       metrics:[{l:"Google Cloud",v:"$10.4B +29%"},{l:"Op Margin",v:"32%"},{l:"Search Rev",v:"$48.5B +14%"}],
+       ah:"+5%",d1o:"~$186",d1c:"~$182",net:"~+4%",
+       pre:"Stock ~$175. Elevated expectations after Q1 re-rating. Market watching for Cloud deceleration or Search erosion from AI competitors. Bar higher.",
+       said:"Rev $84.7B +14% — beat. Cloud $10.4B +29% — sustained acceleration. Search +14% — AI Overviews not cannibalizing. Op margin 32%.",
+       why:"+5% — solid beat, no acceleration vs Q1. Market rewarding execution but not re-rating further at elevated multiple.",
+       upd:"Thesis confirmed: AI is driving Google, not disrupting it. Cloud trajectory solid. Now priced as AI winner — needs to maintain cadence."},
+      {id:"googl-q3-24",label:"Q3 2024",date:"Oct 29, 2024",rev_est:86400,rev_act:88300,eps_est:1.84,eps_act:2.12,
+       metrics:[{l:"Google Cloud",v:"$11.4B +35%"},{l:"Op Margin",v:"32%"},{l:"YouTube+Subs",v:">$50B TTM"}],
+       ah:"+6%",d1o:"~$198",d1c:"~$194",net:"~+5%",
+       pre:"Stock ~$185. Cloud momentum crucial. Competition from Azure and AWS intensifying. OpenAI partnership with Microsoft creating narrative risk.",
+       said:"Rev $88.3B +15% — beat. Cloud $11.4B +35% — acceleration again. EPS $2.12 +37% YoY. YouTube+Subscriptions TTM crossed $50B for first time.",
+       why:"+6% AH. Cloud reaccelerated for second consecutive quarter. Market pricing sustained AI infrastructure buildout benefiting GCP. Op leverage impressive.",
+       upd:"Cloud acceleration from 28%→29%→35% — clear AI demand pull. GOOGL executing on all cylinders. Valuation premium rebuilding."},
+      {id:"googl-q4-24",label:"Q4 2024",date:"Feb 4, 2025",rev_est:96000,rev_act:96500,eps_est:2.13,eps_act:2.15,
+       metrics:[{l:"Google Cloud",v:"$12.0B +30%"},{l:"2025 Capex Guide",v:"~$75B"},{l:"Op Margin",v:"32%"}],
+       ah:"+4%",d1o:"~$210",d1c:"~$205",net:"~+3%",
+       pre:"Stock ~$200. Full year momentum expected to continue. $75B capex guide pre-announced — market debating if ROI justifies spend. Gemini Ultra launched.",
+       said:"Rev $96.5B +12% — beat. Cloud $12.0B +30% — slight decel from 35%. EPS $2.15 +31%. Capex $75B guide for 2025. Gemini app momentum.",
+       why:"+4% modest. Cloud slight decel from 35%→30% noted by bears. Capex guide enormous — ROI question now active. Beat good but not a surprise at this point.",
+       upd:"Cloud decel to 30% first time in a while — transitory or trend? $75B capex is the new debate. Bulls: captures AI infra wave. Bears: discipline concerns."},
+      {id:"googl-q1-25",label:"Q1 2025",date:"Apr 24, 2025",rev_est:89500,rev_act:90200,eps_est:2.02,eps_act:2.81,
+       metrics:[{l:"Google Cloud",v:"$12.3B +28%"},{l:"AI Overviews",v:"1.5B users/mo"},{l:"Op Margin",v:"34%"}],
+       ah:"+4%",d1o:"~$168",d1c:"~$165",net:"~+3%",
+       pre:"Stock ~$160. Post-DeepSeek correction. Market questioning whether US AI capex is rational. GOOGL down from highs — opportunity or value trap?",
+       said:"Rev $90.2B +12% — beat. EPS $2.81 +49% YoY — blowout. Cloud $12.3B +28%. AI Overviews at 1.5B monthly users. Op margin 34% — 200bps expansion.",
+       why:"+4% AH. EPS massively beat on efficiency gains. Market reassured by margin expansion despite heavy capex. Gemini 2.5 performance narrative solidified.",
+       upd:"Efficiency story adds new dimension to bull case. Not just growth — GOOGL compounding margins while investing. $2.81 EPS at this revenue scale is elite."},
+      {id:"googl-q2-25",label:"Q2 2025",date:"Jul 29, 2025",rev_est:95400,rev_act:96400,eps_est:2.27,eps_act:2.56,
+       metrics:[{l:"Google Cloud",v:"$13.5B +32%"},{l:"Op Margin",v:"35%"},{l:"YouTube Ads",v:"$9.8B +10%"}],
+       ah:"+6%",d1o:"~$178",d1c:"~$175",net:"~+5%",
+       pre:"Stock ~$168. Cloud re-acceleration thesis being tested. Tariff uncertainty creating macro overhang. Search resilience amid AI competitor launches (Perplexity, ChatGPT search) key watch.",
+       said:"Rev $96.4B +12% — beat. Cloud $13.5B +32% — reaccelerated from 28%. EPS $2.56 vs $2.27 — beat. Op margin 35%. Search resilient despite competitors.",
+       why:"+6% AH. Cloud reacceleration was key. Dispelled fears that Azure was taking share. Search durability validated another quarter.",
+       upd:"Cloud 28%→32% reacceleration re-establishes GOOGL as multi-cylinder AI story. The bear case requires data, not narrative."},
+      {id:"googl-q3-25",label:"Q3 2025",date:"Oct 29, 2025",rev_est:99960,rev_act:102300,eps_est:2.26,eps_act:2.87,
+       metrics:[{l:"Google Cloud",v:"$14.9B +35%"},{l:"Cloud Backlog",v:"$155B"},{l:"Gemini App",v:"650M MAU"}],
+       ah:"+6%",d1o:"~$295",d1c:"~$288",net:"~+5%",
+       pre:"Stock ~$278. First time company could cross $100B in a single quarter. AI momentum in Cloud the dominant variable. Bears running out of arguments.",
+       said:"Rev $102.3B — first $100B quarter in company history. +15% YoY. Cloud $14.9B +35% — acceleration again. EPS $2.87 vs $2.26 — massive beat. Cloud backlog $155B. Gemini 650M MAU.",
+       why:"+6% AH. Historical milestone + Cloud acceleration combo. Market pricing GOOGL as sustained AI infrastructure winner. Gemini engagement metrics add confidence.",
+       upd:"GOOGL is unambiguously in the AI winner category. Cloud backlog $155B provides long revenue visibility. Multiple can expand further."},
+      {id:"googl-q4-25",label:"Q4 2025",date:"Feb 4, 2026",rev_est:111430,rev_act:113830,eps_est:2.61,eps_act:2.82,
+       metrics:[{l:"Google Cloud",v:"$17.3B +48%"},{l:"2026 Capex Guide",v:"$175-185B"},{l:"FY2025 Rev",v:"$403B"}],
+       ah:"-3%",d1o:"~$190",d1c:"~$186",net:"~-4%",
+       pre:"Stock ~$195. Full year momentum expected. $175-185B capex guide pre-leaked — debate about ROI discipline intensifying. Cloud at ~$60B+ run rate.",
+       said:"Rev $113.8B vs $111.4B — beat. EPS $2.82 vs $2.61 — beat. Cloud $17.3B +48% — massive acceleration. FY2025 $403B total first time. But 2026 capex $175-185B — nearly double 2025.",
+       why:"-3% AH despite strong beat. Capex nearly doubling to $175-185B spooked market on ROI. Bears: spending discipline lost. Bulls: capturing once-in-decade AI infra wave.",
+       upd:"The capex debate is the story now. $175B is a generational bet on AI infrastructure. GOOGL is either ahead of the curve or overinvesting. Q1 2026 cloud growth will be the tell."}
+    ]},
+    AMZN:{company:"Amazon.com Inc.",sector:"E-commerce / Cloud / AI",exchange:"NASDAQ",quarters:[
+      {id:"amzn-q1-24",label:"Q1 2024",date:"Apr 30, 2024",rev_est:142400,rev_act:143300,eps_est:0.83,eps_act:0.98,
+       metrics:[{l:"AWS Rev",v:"$25.0B +17%"},{l:"Op Income",v:"$15.3B"},{l:"Op Margin",v:"10.7%"}],
+       ah:"+3%",d1o:"~$185",d1c:"~$182",net:"~+2%",
+       pre:"Stock ~$180. AWS re-acceleration thesis building after cloud optimization headwinds in 2023. Operating margin expansion the new bull narrative. Advertising emerging as high-margin layer.",
+       said:"Rev $143.3B +13% — beat. AWS $25B +17% — re-acceleration confirmed. Op income $15.3B, margin 10.7% — doubling year prior. Advertising growing fast.",
+       why:"+3% modest. AWS re-acceleration plus op leverage was expected by bulls. Stock had already moved up 30%+ in anticipation. Good print, muted reaction at elevated price.",
+       upd:"AWS re-acceleration is real. Operating leverage story confirmed. Amazon is now a profitable growth machine, not just a revenue growth story."},
+      {id:"amzn-q2-24",label:"Q2 2024",date:"Aug 1, 2024",rev_est:148700,rev_act:148000,eps_est:1.03,eps_act:1.26,
+       metrics:[{l:"AWS Rev",v:"$26.3B +19%"},{l:"Op Income",v:"$14.7B"},{l:"Advertising",v:"$14.7B +19%"}],
+       ah:"+3%",d1o:"~$196",d1c:"~$192",net:"~+2%",
+       pre:"Stock ~$190. Market watching whether AWS can sustain re-acceleration. GenAI workloads as incremental revenue driver — early innings.",
+       said:"Rev $148B +10% — slight miss on revenue. EPS $1.26 vs $1.03 — beat. AWS $26.3B +19%. Op income $14.7B. Advertising +19%.",
+       why:"+3% modest. Revenue slight miss offset by EPS beat. AWS maintained trajectory. Market settling into a steady grower narrative.",
+       upd:"Advertising emerging as a third major profit driver alongside AWS and retail. Three-engine model increasingly visible to market."},
+      {id:"amzn-q3-24",label:"Q3 2024",date:"Oct 31, 2024",rev_est:157200,rev_act:158900,eps_est:1.14,eps_act:1.43,
+       metrics:[{l:"AWS Rev",v:"$27.5B +19%"},{l:"Op Income",v:"$17.4B"},{l:"Op Margin",v:"11%"}],
+       ah:"+6%",d1o:"~$213",d1c:"~$208",net:"~+5%",
+       pre:"Stock ~$200. AWS acceleration watch. AI workload commentary from management key. Operating margin expansion story intact.",
+       said:"Rev $158.9B +11% — beat. AWS $27.5B +19% — consistent. EPS $1.43 vs $1.14 — beat. Op income $17.4B. Bedrock/AI services gaining customer traction.",
+       why:"+6% AH. Both revenue and earnings beat meaningfully. AWS holding 19% growth while op leverage building simultaneously — premium multiple justified.",
+       upd:"The operating leverage flywheel is accelerating. AWS + advertising + retail efficiency = margin expansion thesis playing out ahead of schedule."},
+      {id:"amzn-q4-24",label:"Q4 2024",date:"Feb 6, 2025",rev_est:187300,rev_act:187800,eps_est:1.49,eps_act:1.86,
+       metrics:[{l:"AWS Rev",v:"$28.8B +19%"},{l:"Op Income",v:"$21.2B"},{l:"2025 Q1 Guide",v:"$151-155.5B"}],
+       ah:"-4%",d1o:"~$234",d1c:"~$226",net:"~-5%",
+       pre:"Stock ~$238. Record quarter expected given holiday season. Q1 2025 guide the key variable. AWS needs to maintain +19% to hold the narrative.",
+       said:"Rev $187.8B +10% — beat. EPS $1.86 vs $1.49 — beat. AWS $28.8B +19%. Op income $21.2B. But Q1 guide $151-155.5B — below consensus $158.6B.",
+       why:"-4% AH despite strong beat. Q1 guidance below consensus. Market concerned about deceleration in early 2025. Tariff exposure to retail also flagged.",
+       upd:"Guide miss is the story. Strong Q4 execution offset by cautious Q1 outlook. Bears: retail exposure to tariffs. Bulls: AWS can offset with continued cloud growth."},
+      {id:"amzn-q1-25",label:"Q1 2025",date:"May 1, 2025",rev_est:155200,rev_act:155700,eps_est:1.36,eps_act:1.59,
+       metrics:[{l:"AWS Rev",v:"$29.3B +17%"},{l:"Op Income",v:"$18.4B"},{l:"Op Margin",v:"11.8%"}],
+       ah:"+2%",d1o:"~$197",d1c:"~$193",net:"+1%",
+       pre:"Stock ~$195. Post-guide-miss correction. Q1 guide of $151-155.5B already digested. Tariff impact to retail businesses the macro overhang. AWS decelerating slightly.",
+       said:"Rev $155.7B — in-line with top of guide. EPS $1.59 vs $1.36 — beat. AWS $29.3B +17% — slight decel from 19%. Op income $18.4B +63% YoY.",
+       why:"+2% modest. Modest beat. AWS slight decel watched carefully. Operating leverage story intact despite slowdown.",
+       upd:"AWS decel from 19%→17% is a yellow flag, not a red one. Tariff uncertainty hurts retail sentiment. Operating leverage remains the primary bull driver."},
+      {id:"amzn-q2-25",label:"Q2 2025",date:"Aug 7, 2025",rev_est:163900,rev_act:168000,eps_est:1.64,eps_act:1.96,
+       metrics:[{l:"AWS Rev",v:"$31.4B +19%"},{l:"Op Income",v:"$21.0B"},{l:"Advertising",v:"$16.8B +22%"}],
+       ah:"+8%",d1o:"~$216",d1c:"~$212",net:"~+7%",
+       pre:"Stock ~$198. AWS decel concerns from Q1 being tested. Tariff impact to retail one-time or structural? Op margin sustainability questioned.",
+       said:"Rev $168B +9% — beat. EPS $1.96 vs $1.64 — beat. AWS $31.4B +19% — reaccelerated. Op income $21B. Advertising +22% strong. AWS reacceleration removes bear case.",
+       why:"+8% AH. AWS reacceleration from 17%→19% the key positive surprise. Showed Q1 decel was timing, not trend. EPS beat large. Multiple re-rated upward.",
+       upd:"AWS reacceleration re-establishes bull thesis. Advertising becoming a consistent double-digit growth driver. AMZN operating leverage story back on track."},
+      {id:"amzn-q3-25",label:"Q3 2025",date:"Oct 30, 2025",rev_est:174600,rev_act:177700,eps_est:1.78,eps_act:2.02,
+       metrics:[{l:"AWS Rev",v:"$33.0B +19%"},{l:"Op Income",v:"$22.6B"},{l:"Op Margin",v:"12.7%"}],
+       ah:"+5%",d1o:"~$230",d1c:"~$225",net:"~+4%",
+       pre:"Stock ~$218. Sustained AWS acceleration watch. Op margin expansion story vs. heavy AI capex spend — can both continue?",
+       said:"Rev $177.7B +11% — beat. EPS $2.02 vs $1.78 — beat. AWS $33B +19% — sustained. Op income $22.6B. Capex heavy but margins expanding simultaneously.",
+       why:"+5% AH. Consistent execution. AWS sustained 19% for second consecutive quarter. Op margin 12.7% — expanding despite heavy investment.",
+       upd:"AMZN compounding profitability while investing heavily in AI infra. The efficiency + growth narrative is the cleanest story in mega-cap tech."},
+      {id:"amzn-q4-25",label:"Q4 2025",date:"Feb 5, 2026",rev_est:189000,rev_act:192500,eps_est:1.73,eps_act:1.86,
+       metrics:[{l:"AWS Rev",v:"$35.0B +19%"},{l:"Op Income",v:"$23.5B"},{l:"Q1 2026 Guide",v:"$159-164B"}],
+       ah:"-5%",d1o:"~$225",d1c:"~$218",net:"~-7%",
+       pre:"Stock ~$232. Record holiday quarter expected. Q1 2026 guide the key variable again. AWS at ~$140B run rate.",
+       said:"Rev $192.5B +10% — beat. EPS $1.86 vs $1.73 — beat. AWS $35B +19%. Q1 2026 guide $159-164B — slightly below consensus $166B.",
+       why:"-5% despite beat. Same dynamic as Q4 2024 — solid quarter, guide modestly cautious. Market sensitive to guide misses at elevated multiples.",
+       upd:"Pattern established: AMZN delivers strong results, guides conservatively, stock fades. The guide is the tell, not the print."}
+    ]},
+    MSFT:{company:"Microsoft Corporation",sector:"Enterprise Cloud / AI",exchange:"NASDAQ",quarters:[
+      {id:"msft-q3-fy24",label:"Q3 FY24",date:"Apr 25, 2024",rev_est:60800,rev_act:61900,eps_est:2.83,eps_act:2.94,
+       metrics:[{l:"Azure Growth",v:"+31% CC"},{l:"Cloud Rev",v:"$35.1B +23%"},{l:"Op Margin",v:"45.6%"}],
+       ah:"+5%",d1o:"~$420",d1c:"~$413",net:"~+4%",
+       pre:"Stock ~$400. Azure acceleration watch. Copilot enterprise penetration early data. OpenAI partnership ROI question active. Bar elevated after strong Q2.",
+       said:"Rev $61.9B +17% — beat. Azure +31% CC — acceleration. EPS $2.94 vs $2.83 — beat. Copilot seats ramping. Op margin 45.6%.",
+       why:"+5% AH. Azure acceleration from 28%→31% was the key. Copilot monetization beginning to show in numbers. Market re-rates AI enterprise story.",
+       upd:"Azure re-acceleration validates the AI infrastructure demand pull. Copilot adds a new monetization layer on top. MSFT has the clearest AI revenue model in enterprise."},
+      {id:"msft-q4-fy24",label:"Q4 FY24",date:"Jul 30, 2024",rev_est:64400,rev_act:64700,eps_est:2.93,eps_act:2.95,
+       metrics:[{l:"Azure Growth",v:"+29% CC"},{l:"Cloud Rev",v:"$36.8B +21%"},{l:"Copilot",v:"Accelerating"}],
+       ah:"-3%",d1o:"~$445",d1c:"~$436",net:"~-4%",
+       pre:"Stock ~$450. Azure at 31% — market expecting continued acceleration. Copilot monetization expected to show more meaningfully. Bar very high.",
+       said:"Rev $64.7B +15% — beat. Azure +29% CC — slight decel from 31%. EPS $2.95 — beat but thin. Capex $19B — significant increase. Data center capacity constraint flagged.",
+       why:"-3% AH. Azure decel from 31%→29% disappointed bulls expecting 32%+. Capacity constraint commentary negative. Market sensitive to any Azure slowdown.",
+       upd:"Azure capacity constraint is the key new risk. If supply-constrained, growth ceiling regardless of demand. Data center buildout timeline matters."},
+      {id:"msft-q1-fy25",label:"Q1 FY25",date:"Oct 30, 2024",rev_est:64500,rev_act:65600,eps_est:3.10,eps_act:3.30,
+       metrics:[{l:"Azure Growth",v:"+33% CC"},{l:"Cloud Rev",v:"$38.9B +22%"},{l:"Copilot M365",v:"Growing fast"}],
+       ah:"+5%",d1o:"~$470",d1c:"~$462",net:"~+4%",
+       pre:"Stock ~$450. Azure capacity concerns from Q4 — did they resolve? AI PC cycle tailwind watch. Copilot adoption data key.",
+       said:"Rev $65.6B +16% — beat. Azure +33% CC — reaccelerated from 29%. EPS $3.30 vs $3.10 — beat. Capacity constraints easing. M365 Copilot seats accelerating.",
+       why:"+5% AH. Azure reacceleration from 29%→33% addressed the bear case directly. Supply constraints resolved faster than feared. Multiple expanded.",
+       upd:"Capacity constraint was transitory. Azure back at 33%. Copilot monetization building. The AI + cloud + productivity flywheel is intact."},
+      {id:"msft-q2-fy25",label:"Q2 FY25",date:"Jan 29, 2025",rev_est:68800,rev_act:69600,eps_est:3.11,eps_act:3.23,
+       metrics:[{l:"Azure Growth",v:"+31% CC"},{l:"Cloud Rev",v:"$40.9B +21%"},{l:"FY25 Capex",v:"~$80B+"}],
+       ah:"-5%",d1o:"~$430",d1c:"~$420",net:"~-7%",
+       pre:"Stock ~$445. Azure at 33% — bar elevated. Copilot upsell momentum key. DeepSeek news breaking simultaneously — OpenAI moat question active.",
+       said:"Rev $69.6B +12% — beat. Azure +31% CC — decel from 33%. EPS $3.23 vs $3.11 — beat. But Azure guidance for Q3 at 34-35% was read as decel continuation risk.",
+       why:"-5% AH. DeepSeek narrative broke same night — market questioned OpenAI investment ROI. Azure slight decel. Perfect storm for multiple compression.",
+       upd:"DeepSeek + Azure decel combo hit the stock. The OpenAI dependency (45% of commercial RPO) is now a risk flag, not just an asset. Market repricing AI spend ROI."},
+      {id:"msft-q3-fy25",label:"Q3 FY25",date:"Apr 30, 2025",rev_est:68400,rev_act:70100,eps_est:3.22,eps_act:3.46,
+       metrics:[{l:"Azure Growth",v:"+35% CC"},{l:"Cloud Rev",v:"$42.4B +20%"},{l:"Copilot Revenue",v:"Materializing"}],
+       ah:"+9%",d1o:"~$395",d1c:"~$388",net:"~+7%",
+       pre:"Stock ~$360. Down ~20% from highs post-DeepSeek. Azure decel fears + OpenAI valuation concerns. Bar lowered — market not expecting acceleration.",
+       said:"Rev $70.1B +13% — beat. Azure +35% CC — reaccelerated from 31%. EPS $3.46 vs $3.22 — beat. M365 Copilot revenue becoming material. GitHub Copilot 15M+ users.",
+       why:"+9% AH. Azure reacceleration from 31%→35% against a lowered bar was powerful. DeepSeek fears overblown in practice — AI demand accelerating. Big short squeeze.",
+       upd:"Azure 35% is the highest in years. Proves enterprise AI demand is durable, not just hype. OpenAI concerns overpriced the downside. MSFT executing."},
+      {id:"msft-q4-fy25",label:"Q4 FY25",date:"Jul 30, 2025",rev_est:73800,rev_act:76440,eps_est:3.37,eps_act:3.65,
+       metrics:[{l:"Azure Growth",v:"+40%+ CC"},{l:"Azure Annual Rev",v:">$75B"},{l:"FY25 Total",v:"$281.7B +15%"}],
+       ah:"+9%",d1o:"~$547",d1c:"~$538",net:"~+8%",
+       pre:"Stock ~$500. Azure at 35% in Q3 — can it sustain or accelerate? FY25 capex ~$80B already committed. Stock near ATH.",
+       said:"Rev $76.4B +18% — beat significantly. EPS $3.65 vs $3.37. Azure >40%+ — first time in years at this level. Azure annual revenue crossed $75B. FY25 total $281.7B.",
+       why:"+9% AH. Azure >40% was historic — showed enterprise AI adoption is in the early innings of a sustained cycle. FY26 capex guided higher but market didn't care given growth.",
+       upd:"Peak AI enterprise demand confirmation. Azure at 40%+ reshapes the multiple conversation. MSFT may be the best AI revenue story in mega-cap tech."},
+      {id:"msft-q1-fy26",label:"Q1 FY26",date:"Oct 29, 2025",rev_est:75900,rev_act:78600,eps_est:3.10,eps_act:3.31,
+       metrics:[{l:"Azure Growth",v:"+38% CC"},{l:"Cloud Rev",v:"$46.2B"},{l:"Copilot Revenue",v:"$1B+ run rate"}],
+       ah:"+4%",d1o:"~$462",d1c:"~$455",net:"~+3%",
+       pre:"Stock ~$445. Post-ATH. Azure at 40%+ — can it hold? AI PC cycle starting. FY26 capex $100B+ flagged. Expectations elevated.",
+       said:"Rev $78.6B +16% — beat. Azure +38% CC — slight decel from 40%+. EPS $3.31 vs $3.10 — beat. Copilot approaching $1B revenue run rate. FY26 capex >$100B.",
+       why:"+4% AH. Azure minor decel from 40%+ but 38% is still exceptional. Copilot milestone approaching. Moderate positive reaction given high bar.",
+       upd:"Azure at 38% is still elite growth for this scale. Copilot monetization approaching $1B milestone. FY26 capex acceleration is the key risk to watch."},
+      {id:"msft-q2-fy26",label:"Q2 FY26",date:"Jan 28, 2026",rev_est:80300,rev_act:81300,eps_est:3.23,eps_act:3.43,
+       metrics:[{l:"Azure Growth",v:"+38% CC"},{l:"Cloud Rev",v:"$47.8B"},{l:"FY26 Capex",v:"$106.9B guided"}],
+       ah:"-5%",d1o:"~$430",d1c:"~$418",net:"~-7%",
+       pre:"Stock ~$440. Azure at 38% last quarter. Capex escalation concerns. OpenAI RPO concentration (45% of commercial RPO) flagged by analysts.",
+       said:"Rev $81.3B +16.7% — beat. Azure +38% CC — maintained. EPS $3.43 — beat. But FY26 capex guided $106.9B — market shocked. OpenAI dependency = 45% commercial RPO.",
+       why:"-5% post-earnings, then -18% over subsequent weeks. $106.9B capex guide was the trigger. Combined with Oracle comparison (OpenAI scaffolding risk), ROI debate exploded.",
+       upd:"Capex discipline question dominates. $106.9B is a generational infrastructure bet. The bull case requires AI monetization to accelerate proportionally. Azure growth at 38% is good — but is it good enough?"}
+    ]},
+    META:{company:"Meta Platforms Inc.",sector:"Social Media / AI",exchange:"NASDAQ",quarters:[
+      {id:"meta-q1-24",label:"Q1 2024",date:"Apr 24, 2024",rev_est:36100,rev_act:36500,eps_est:4.32,eps_act:4.71,
+       metrics:[{l:"DAP",v:"3.24B +7%"},{l:"Ad Revenue",v:"$35.6B +27%"},{l:"Op Margin",v:"38%"}],
+       ah:"-8%",d1o:"~$441",d1c:"~$432",net:"~-8%",
+       pre:"Stock ~$490. Year of efficiency narrative fully priced. Market expecting massive capex acceleration for AI. Strong ad results expected but capex guide the variable.",
+       said:"Rev $36.5B +27% — beat. EPS $4.71 vs $4.32 — beat. DAP 3.24B. But 2024 capex guide raised to $35-40B (from $30-37B) AND flagged 'significant infrastructure investments in 2025'.",
+       why:"-8% AH despite strong beat. Capex guide hike + warning of even higher 2025 spend spooked investors accustomed to the efficiency narrative. Year of Efficiency → Year of Investment.",
+       upd:"Regime change: efficiency era ending, investment era beginning. Bulls need to believe AI ROI will justify the spend. Bears see discipline eroding."},
+      {id:"meta-q2-24",label:"Q2 2024",date:"Jul 31, 2024",rev_est:38200,rev_act:39100,eps_est:4.72,eps_act:5.16,
+       metrics:[{l:"Ad Rev Growth",v:"+22%"},{l:"AI Ad Tools",v:"Accelerating"},{l:"Threads MAU",v:"175M"}],
+       ah:"+5%",d1o:"~$520",d1c:"~$510",net:"~+4%",
+       pre:"Stock ~$495. Post-capex-concern correction partially recovered. AI ad tools (Advantage+) showing early ROI data. Market more comfortable with investment cycle.",
+       said:"Rev $39.1B +22% — beat. EPS $5.16 vs $4.72 — beat. AI-powered ad tools driving engagement and pricing. Advantage+ penetration growing. Llama 3 open source.",
+       why:"+5% AH. Strong ad performance + management commentary showing AI investment paying off in ad revenue. Market buying the ROI story.",
+       upd:"AI investment thesis validated by ad metrics. Advantage+ is monetizing AI spend directly. The capex-to-revenue loop is clearer than any other company."},
+      {id:"meta-q3-24",label:"Q3 2024",date:"Oct 30, 2024",rev_est:40100,rev_act:40600,eps_est:5.21,eps_act:6.03,
+       metrics:[{l:"Ad Rev",v:"$39.9B +19%"},{l:"Op Margin",v:"43%"},{l:"DAP",v:"3.29B +5%"}],
+       ah:"+4%",d1o:"~$579",d1c:"~$568",net:"~+3%",
+       pre:"Stock ~$565. Three consecutive beats. AI ad tools now consensus bull driver. Reality Labs losses watched but tolerated. Bar elevated.",
+       said:"Rev $40.6B +19% — beat. EPS $6.03 vs $5.21 — massive beat. Op margin 43% — highest ever. AI ad monetization compounding. Reality Labs losses $4.4B.",
+       why:"+4% modest. Strong results largely expected at this point. EPS beat was exceptional but stock had already re-rated. Multiple at premium requires continued beats.",
+       upd:"Op margin 43% is stunning. META demonstrating that AI investment can improve both revenue and margins simultaneously. The efficiency + growth combo is the new normal."},
+      {id:"meta-q4-24",label:"Q4 2024",date:"Jan 29, 2025",rev_est:46900,rev_act:48400,eps_est:6.76,eps_act:8.02,
+       metrics:[{l:"Ad Rev",v:"$46.8B +21%"},{l:"2025 Capex Guide",v:"$60-65B"},{l:"Op Margin",v:"48%"}],
+       ah:"-3%",d1o:"~$628",d1c:"~$612",net:"~-4%",
+       pre:"Stock ~$640. Record quarter expected. 2025 capex guide the crucial variable after year of concerns. Op margin at highs.",
+       said:"Rev $48.4B +21% — beat. EPS $8.02 vs $6.76 — huge beat. Op margin 48% — record. But 2025 capex guide $60-65B — significantly above $37B prior year. 'Significant' 2025 AI investment.",
+       why:"-3% AH. Record EPS/margin offset by massive capex guide hike to $60-65B. Same dynamic as Q1 2024 — market penalizing sudden capex escalation.",
+       upd:"$60-65B capex guide is the test of conviction. Bulls: META monetizing AI faster than anyone, ROI will follow. Bears: discipline deteriorating."},
+      {id:"meta-q1-25",label:"Q1 2025",date:"Apr 30, 2025",rev_est:41300,rev_act:42300,eps_est:5.22,eps_act:6.43,
+       metrics:[{l:"DAP",v:"3.43B +6%"},{l:"Ad Imp",v:"+5% YoY"},{l:"Ad Price",v:"+10% YoY"}],
+       ah:"+6%",d1o:"~$569",d1c:"~$558",net:"~+5%",
+       pre:"Stock ~$535. Post-capex-concern decline. Tariff uncertainty creating macro ad spend overhang. Bar lowered from highs. AI ad ROI the watch.",
+       said:"Rev $42.3B +16% — beat. EPS $6.43 vs $5.22 — massive beat. DAP 3.43B. AI tools driving ad price +10% AND impression +5%. Second highest quarterly profit ever.",
+       why:"+6% AH. Ad performance exceptional despite tariff concerns. AI monetization loop working: AI improves ad targeting → higher prices → higher margins. Q2 guide acceleration implied.",
+       upd:"AI is working in the P&L. The capex spending is showing up directly in ad revenue and margins. META may be the clearest AI ROI story in the market."},
+      {id:"meta-q2-25",label:"Q2 2025",date:"Jul 30, 2025",rev_est:44700,rev_act:47300,eps_est:5.70,eps_act:6.93,
+       metrics:[{l:"Ad Rev",v:"$46.6B +22%"},{l:"Op Margin",v:"41%"},{l:"AI Infra Spend",v:"Heavy"}],
+       ah:"+8%",d1o:"~$620",d1c:"~$610",net:"~+7%",
+       pre:"Stock ~$575. Tariff macro fears fading. AI ad monetization the primary bull driver. 2025 capex raised repeatedly — market now focused on whether revenue keeps pace.",
+       said:"Rev $47.3B +22% — meaningful beat. EPS $6.93 vs $5.70 — beat. Ad revenue $46.6B. Op margin 41%. Q3 guide midpoint implies 30% growth — new high-water mark.",
+       why:"+8% AH. 30% growth implied for Q3 — highest since AI monetization began. Market rerated upward. The capex → ad revenue → margin loop is the cleanest AI monetization story.",
+       upd:"If Q3 delivers 30% ad growth, META's capex will be decisively vindicated. The stock is pricing in the acceleration."},
+      {id:"meta-q3-25",label:"Q3 2025",date:"Oct 29, 2025",rev_est:51500,rev_act:53000,eps_est:6.69,eps_act:8.01,
+       metrics:[{l:"Ad Rev",v:"$52.1B +30%"},{l:"Op Margin",v:"43%"},{l:"Llama Adoption",v:"Billions of uses"}],
+       ah:"+5%",d1o:"~$658",d1c:"~$645",net:"~+4%",
+       pre:"Stock ~$630. 30% growth implied from Q2 guide. If META delivers, it's the cleanest AI ROI proof point in mega-cap. Bar extremely elevated.",
+       said:"Rev $53.0B +29% — beat. EPS $8.01 vs $6.69 — beat. Ad revenue +30% YoY. Op margin 43%. Llama open source adoption accelerating. $5-8B additional capex raised for 2025.",
+       why:"+5% modest. 30% growth delivered as guided. Market digesting the capex guide raise. Extraordinary results already partially priced in from Q2 guide.",
+       upd:"30% ad growth at $50B+ revenue scale is historic. The AI monetization loop is proven. Capex raise is incremental concern but bulls have the data now."},
+      {id:"meta-q4-25",label:"Q4 2025",date:"Jan 29, 2026",rev_est:72000,rev_act:78000,eps_est:8.00,eps_act:9.01,
+       metrics:[{l:"Ad Rev",v:"$76.8B +23%"},{l:"2026 Capex Guide",v:"$114-119B"},{l:"Op Margin",v:"48%"}],
+       ah:"+8%",d1o:"~$712",d1c:"~$698",net:"~+7%",
+       pre:"Stock ~$660. Record quarter expected. 2026 capex guide the market-moving variable. Bears watching for discipline crack.",
+       said:"Rev $78B — beat. EPS $9.01 vs $8.00 — beat. Op margin 48% record. But 2026 capex guide $114-119B — doubling from ~$60-65B in 2025.",
+       why:"+8% AH. Unlike MSFT/GOOGL, META's capex guide was accepted enthusiastically. Reason: the ad revenue ROI loop is proven at scale. Q1 guide implied 30%+ again.",
+       upd:"META is the one mega-cap where market accepts capex escalation without penalty — because every dollar spent has proven revenue ROI. The gap vs MSFT/GOOGL is stark."}
+    ]},
+    PLTR:{company:"Palantir Technologies Inc.",sector:"Enterprise AI / Defense",exchange:"NASDAQ",quarters:[
+      {id:"pltr-q1-24",label:"Q1 2024",date:"May 6, 2024",rev_est:624,rev_act:634,eps_est:0.07,eps_act:0.08,
+       metrics:[{l:"US Commercial",v:"$150M +40%"},{l:"US Comm Customers",v:"262 +69%"},{l:"Rule of 40",v:"57%"}],
+       ah:"+6%",d1o:"~$23",d1c:"~$22",net:"~+4%",
+       pre:"Stock ~$21. AIP (Artificial Intelligence Platform) boot camps driving US commercial growth narrative. Market debating whether PLTR is a real AI company or a defense contractor wearing AI clothes.",
+       said:"Rev $634M +21% — beat. US commercial +40% — acceleration. 262 customers +69% YoY. 6th consecutive GAAP profitable quarter. AIP boot camp velocity high.",
+       why:"+6% AH. US commercial growth showing clear AI product-market fit. GAAP profitability streak validates cost discipline. Rule of 40 score rising.",
+       upd:"AIP boot camp model is working. Converting enterprise proof-of-concepts to production faster than any comparable AI software vendor."},
+      {id:"pltr-q2-24",label:"Q2 2024",date:"Aug 5, 2024",rev_est:651,rev_act:678,eps_est:0.08,eps_act:0.09,
+       metrics:[{l:"US Commercial",v:"$159M +55%"},{l:"US Comm Customers",v:"295 +83%"},{l:"Rule of 40",v:"64%"}],
+       ah:"+11%",d1o:"~$31",d1c:"~$29",net:"~+9%",
+       pre:"Stock ~$27. AIP traction building narrative. NYSE uplist pending (completed Sept 2024). Index inclusion eligibility key re-rating catalyst.",
+       said:"Rev $678M +27% — beat. US commercial +55% — further acceleration. Customers +83%. Rule of 40 score 64%. GAAP EPS record $0.06.",
+       why:"+11% AH. US commercial reacceleration from 40%→55% was the headline. NYSE uplist + S&P 500 inclusion candidate. Retail + institutional demand surge.",
+       upd:"US commercial AIP thesis fully operational. S&P 500 inclusion coming — structural demand from index funds will absorb supply. Re-rating catalyst identified."},
+      {id:"pltr-q3-24",label:"Q3 2024",date:"Nov 4, 2024",rev_est:700,rev_act:725,eps_est:0.09,eps_act:0.10,
+       metrics:[{l:"US Commercial",v:"$179M +54%"},{l:"US Govt",v:"$320M +40%"},{l:"Rule of 40",v:"68%"}],
+       ah:"+10%",d1o:"~$46",d1c:"~$44",net:"~+8%",
+       pre:"Stock ~$40. S&P 500 inclusion completed Sept 23. Massive passive fund buying absorbed. Trump election tailwind — DOGE implications for gov spending on tech efficiency.",
+       said:"Rev $725M +30% — beat. US commercial +54%. US government +40%. Rule of 40 score 68%. DOGE/Trump tailwind emerging in narrative.",
+       why:"+10% AH. Dual engine: US commercial accelerating AND government inflecting. Trump DOGE narrative = PLTR positioned as government efficiency tech. New total addressable market.",
+       upd:"DOGE creates a new bull thesis layer: PLTR software as the tool for federal government efficiency. This is incremental to the existing commercial AI story."},
+      {id:"pltr-q4-24",label:"Q4 2024",date:"Feb 3, 2025",rev_est:775,rev_act:828,eps_est:0.11,eps_act:0.14,
+       metrics:[{l:"US Commercial",v:"$214M +64%"},{l:"US Govt",v:"$343M +45%"},{l:"US TCV",v:"$803M +134%"}],
+       ah:"+20%",d1o:"~$110",d1c:"~$105",net:"~+18%",
+       pre:"Stock ~$85. DOGE narrative + AIP commercial + government all converging. 2025 guidance the key variable. Stock up 4x in a year. Multiple elevated but momentum real.",
+       said:"Rev $828M +36% — massive beat. US commercial +64%. US govt +45%. US TCV $803M +134% — record commercial booking. 2025 guide: 31% YoY growth — obliterated consensus.",
+       why:"+20% AH. 36% revenue beat, 134% US commercial TCV, and 2025 guidance of 31% growth all simultaneously above any expectation. Multiple inflection.",
+       upd:"Every variable is accelerating simultaneously. AIP + government + commercial all hitting new highs. PLTR may be the best execution story in enterprise AI."},
+      {id:"pltr-q1-25",label:"Q1 2025",date:"May 5, 2025",rev_est:862,rev_act:884,eps_est:0.12,eps_act:0.13,
+       metrics:[{l:"US Commercial",v:"$255M +71%"},{l:"US Govt",v:"$373M +45%"},{l:"Adj Op Margin",v:"44%"}],
+       ah:"-12%",d1o:"~$120",d1c:"~$108",net:"~-14%",
+       pre:"Stock ~$125. Post-Q4 euphoria. Multiple at 200x+ forward earnings. Bar set impossibly high. Market pricing in continued acceleration on every metric.",
+       said:"Rev $884M +39% — beat. US commercial +71%. Still strong. But 2025 full year guide slightly below the most aggressive bull estimates. Adj op margin 44%.",
+       why:"-12% AH despite strong beat. Guide not quite enough to justify 200x+ multiple. Pure multiple compression — the business is fine, the valuation was extreme.",
+       upd:"First lesson: even exceptional businesses fall when multiple is overextended. The business is executing. The stock was priced for perfection."},
+      {id:"pltr-q2-25",label:"Q2 2025",date:"Aug 4, 2025",rev_est:935,rev_act:1070,eps_est:0.13,eps_act:0.16,
+       metrics:[{l:"US Commercial",v:"$325M +80%"},{l:"Rule of 40",v:"83%"},{l:"Adj Op Margin",v:"46%"}],
+       ah:"+11%",d1o:"~$138",d1c:"~$132",net:"~+9%",
+       pre:"Stock ~$122. Post-correction. Bar recalibrated. Q1 beat showed business intact despite stock drop. Multiple slightly less extreme.",
+       said:"Rev $1.07B — first ever $1B+ quarter. +52% YoY. US commercial +80%. Rule of 40 score 83% — elite. Adj op margin 46%.",
+       why:"+11% AH. $1B milestone is symbolic and substantive. 80% US commercial growth shows the AIP land-and-expand model compounding. Rule of 40 of 83% is top decile.",
+       upd:"$1B run rate crossed. PLTR is now a real-scale enterprise AI company. The bear case (just a narrative) is losing ground with each quarter."},
+      {id:"pltr-q3-25",label:"Q3 2025",date:"Nov 3, 2025",rev_est:1085,rev_act:1070,eps_est:0.14,eps_act:0.16,
+       metrics:[{l:"US Commercial",v:"$$350M +77%"},{l:"Rule of 40",v:"85%"},{l:"Net Dollar Retention",v:"135%"}],
+       ah:"+14%",d1o:"~$155",d1c:"~$148",net:"~+12%",
+       pre:"Stock ~$136. $1B+ quarterly run rate established. DOGE government tailwind evolving. Multiple remains elevated but fundamentals catching up.",
+       said:"Rev $1.07B +52% — beat. US commercial +77%. NDR 135%. Rule of 40 score 85%. Customer count growing 43% YoY. US TCV bookings record.",
+       why:"+14% AH. Three consecutive beats at $1B+ scale. NDR 135% shows existing customers expanding rapidly. Multiple premium increasingly justified by fundamentals.",
+       upd:"The multiple compression risk is reducing as fundamentals grow into it. NDR 135% + Rule of 40 85% = one of the best SaaS profiles at scale."},
+      {id:"pltr-q4-25",label:"Q4 2025",date:"Feb 2, 2026",rev_est:1320,rev_act:1407,eps_est:0.21,eps_act:0.25,
+       metrics:[{l:"US Commercial",v:"$400M +137%"},{l:"US TCV",v:"$4.3B +138%"},{l:"2026 Rev Guide",v:"$7.18-7.20B"}],
+       ah:"+3%",d1o:"~$151",d1c:"~$146",net:"~+2%",
+       pre:"Stock ~$146. Full year momentum. 2026 guidance the key — does 60%+ growth continue? US commercial trajectory the primary bull/bear battleground.",
+       said:"Rev $1.41B +70% — beat. US commercial +137%. US TCV $4.3B +138%. 2026 guide: $7.18-7.20B = 61% growth — above consensus. NDR 139%.",
+       why:"+3% modest AH. Stock had already moved up significantly anticipating good results. 61% guide is exceptional but market partially priced it in. Modest pop.",
+       upd:"PLTR 2026 guide of $7.2B at 61% growth from $4.4B in 2025. If achieved, transforms the valuation math. The AIP platform is the best commercial AI deployment story in the market."}
+    ]},
+    RKLB:{company:"Rocket Lab Corporation",sector:"Space / Aerospace",exchange:"NASDAQ",quarters:[
+      {id:"rklb-q1-24",label:"Q1 2024",date:"May 6, 2024",rev_est:95,rev_act:92.8,eps_est:-0.10,eps_act:-0.12,
+       metrics:[{l:"Electron Launches",v:"3"},{l:"Gross Margin",v:"26.2%"},{l:"Backlog",v:"$1.07B"}],
+       ah:"-12%",d1o:"~$4.80",d1c:"~$4.60",net:"~-14%",
+       pre:"Stock ~$5.50. Neutron development timeline concern. Electron cadence recovery post-2023 issues. Space systems backlog quality watched.",
+       said:"Rev $92.8M +69% YoY — near miss vs estimate. EPS -$0.12 vs -$0.10. 3 launches in Q1. Gross margin 26.2%. Archimedes engine first build completed.",
+       why:"-12% AH on the revenue miss despite strong YoY growth. Market punishes misses harshly at speculative valuations. Neutron timeline slippage also cited.",
+       upd:"Near miss on revenue despite 69% YoY growth shows expectations elevated. Neutron timeline is the make-or-break variable for long-term valuation."},
+      {id:"rklb-q2-24",label:"Q2 2024",date:"Aug 8, 2024",rev_est:100,rev_act:106,eps_est:-0.09,eps_act:-0.13,
+       metrics:[{l:"Electron Launches",v:"5"},{l:"Gross Margin",v:"27%"},{l:"Backlog",v:"$1.07B"}],
+       ah:"+7%",d1o:"~$5.20",d1c:"~$5.00",net:"~+5%",
+       pre:"Stock ~$4.80. Post-Q1 miss recovery. Highest-ever revenue quarter record watch. Launch cadence critical for H2 2024.",
+       said:"Rev $106M +71% — record. Highest ever quarterly revenue. 5 Electron launches. Neutron hot fire test success for Archimedes. Gross margin ~27%.",
+       why:"+7% AH. Record revenue + milestone launch cadence. Archimedes engine test milestone removed a key technical risk. Short covering on the beat.",
+       upd:"Revenue record and engine test milestone. Neutron on track (at the time). The two-business model (Electron + Space Systems) scaling nicely."},
+      {id:"rklb-q3-24",label:"Q3 2024",date:"Nov 12, 2024",rev_est:105,rev_act:104.8,eps_est:-0.10,eps_act:-0.10,
+       metrics:[{l:"Electron Launches",v:"5"},{l:"Gross Margin",v:"27.6%"},{l:"Backlog",v:"$1.07B"}],
+       ah:"-12%",d1o:"~$13",d1c:"~$12",net:"~-10%",
+       pre:"Stock ~$14. Massive run-up on Neutron excitement and sector momentum. Stock up 3x from lows. Multiple very elevated. Bar impossibly high.",
+       said:"Rev $104.8M — miss by $0.2M. In-line EPS. 5 launches. Q4 guide $125-135M. But Neutron development costs accelerating and FY2025 guidance soft relative to elevated expectations.",
+       why:"-12% despite near-in-line results. At 25x+ forward revenue, any shortfall gets punished harshly. Market realized valuation had disconnected from near-term fundamentals.",
+       upd:"Valuation excesses corrected. $104.8M revenue at 25x multiple = $2.6B per quarter priced in. The stock needed the fundamentals to catch up."},
+      {id:"rklb-q4-24",label:"Q4 2024",date:"Feb 24, 2025",rev_est:130,rev_act:132.4,eps_est:-0.10,eps_act:-0.10,
+       metrics:[{l:"FY2024 Rev",v:"$436M +78%"},{l:"Gross Margin",v:"29.3%"},{l:"FY25 Guide",v:"$600M+"}],
+       ah:"+2%",d1o:"~$25",d1c:"~$24",net:"+1%",
+       pre:"Stock ~$24. Post-correction. Neutron tank test upcoming. FY2024 completion. 2025 guidance the key variable.",
+       said:"Rev $132.4M — beat. FY2024 $436M +78%. Gross margin 29.3% expanding. FY2025 guide $600M+ (implying ~38% growth). Neutron progressing.",
+       why:"+2% modest. Beat absorbed well but limited upside at current multiple. FY2025 guide in-line with expectations. Market waiting for Neutron milestones.",
+       upd:"Solid execution. Revenue trajectory clearly heading toward $1B+ range with or without Neutron. Margin expansion story underappreciated."},
+      {id:"rklb-q1-25",label:"Q1 2025",date:"May 12, 2025",rev_est:130,rev_act:122.6,eps_est:-0.10,eps_act:-0.12,
+       metrics:[{l:"Electron Launches",v:"4"},{l:"Gross Margin",v:"29%"},{l:"Backlog",v:"$1.67B"}],
+       ah:"-12%",d1o:"~$22",d1c:"~$20",net:"~-13%",
+       pre:"Stock ~$24. Neutron tank rupture occurred Jan 2025. Market concerned about timeline slip. Launch cadence critical for revenue.",
+       said:"Rev $122.6M — miss. 4 launches (down from 5). Neutron tank rupture confirmed manufacturing defect from third-party. In-housing the build process. Gross margin 29%.",
+       why:"-12% AH. Miss + Neutron tank failure = dual negative. Tank rupture delayed Neutron to Q4 2026 minimum. Key binary de-risking event postponed.",
+       upd:"Tank rupture is a setback but third-party manufacturing defect, not design failure. In-housing gives more control. Neutron Q4 2026 is the new timeline."},
+      {id:"rklb-q2-25",label:"Q2 2025",date:"Aug 11, 2025",rev_est:137,rev_act:140,eps_est:-0.09,eps_act:-0.09,
+       metrics:[{l:"Electron Launches",v:"6 (record)"},{l:"Gross Margin",v:"30%"},{l:"Backlog",v:"$1.72B"}],
+       ah:"+2%",d1o:"~$22",d1c:"~$21",net:"+1%",
+       pre:"Stock ~$21. Post-tank-rupture correction. Recovery in launch cadence critical. Neutron now Q4 2026. Market in show-me mode on Electron execution.",
+       said:"Rev $140M +55% — beat. 6 Electron launches — record quarter. Gross margin 30% — expanding. Backlog $1.72B growing. Neutron new tank construction in-house.",
+       why:"+2% modest. Beat + record launches well-received but muted reaction given Neutron overhang. At these valuations, Electron alone can't drive significant re-rating.",
+       upd:"Electron/Space Systems base business is compounding nicely. Gross margin expansion to 30% shows operational leverage. Neutron is the option, Electron is the floor."},
+      {id:"rklb-q3-25",label:"Q3 2025",date:"Nov 10, 2025",rev_est:147,rev_act:155,eps_est:-0.09,eps_act:-0.08,
+       metrics:[{l:"Electron Launches",v:"6 (tied record)"},{l:"Gross Margin",v:"37% (record)"},{l:"Backlog",v:"$1.85B"}],
+       ah:"+5%",d1o:"~$26",d1c:"~$25",net:"~+4%",
+       pre:"Stock ~$24. Neutron Q4 2026 target. Golden Dome defense initiative = RKLB positioned for SDA contracts. Space Systems business value underappreciated.",
+       said:"Rev $155M +48% — beat. 6 launches. Gross margin 37% — record. Backlog $1.85B growing. Annual launch record within days. SDA/defense positioning strong.",
+       why:"+5% AH. Record gross margin story emerging — 37% is significantly above what the market was modeling. Defense backlog quality improving. Neutron progress incremental.",
+       upd:"Gross margin 37% changes the profitability timeline. If RKLB can approach 40%+ margins on Electron/Space Systems, the valuation math improves without Neutron."},
+      {id:"rklb-q4-25",label:"Q4 2025",date:"Feb 26, 2026",rev_est:171,rev_act:180,eps_est:-0.09,eps_act:-0.09,
+       metrics:[{l:"FY2025 Rev",v:"$602M +38%"},{l:"Backlog",v:"$1.85B +73%"},{l:"Gross Margin",v:"38%"}],
+       ah:"-1.5%",d1o:"~$70",d1c:"~$68",net:"~-2%",
+       pre:"Stock ~$70. Year-end review. FY2025 guidance $600M+ to be confirmed. Neutron tank update expected. SDA Tranche III award the key new catalyst.",
+       said:"Rev $180M +36% — beat. FY2025 $602M +38%. Backlog $1.85B +73% — huge growth from SDA Tranche III. Gross margin 38%. Neutron delayed to Q4 2026. FY2026 guide $885M.",
+       why:"-1.5% — effectively flat. Another Neutron delay was the negative. Beat + backlog surge = positive. They cancel. Market waiting on Neutron launch for the next re-rating.",
+       upd:"Backlog +73% to $1.85B changes the base business quality. Defense contracts providing revenue visibility. Neutron Q4 2026 is the binary. Everything else is executing."}
+    ]},
+    CRWV:{company:"CoreWeave Inc.",sector:"AI Cloud Infrastructure",exchange:"NASDAQ",quarters:[
+      {id:"crwv-q1-25",label:"Q1 2025",date:"May 14, 2025",rev_est:853,rev_act:982,eps_est:-0.55,eps_act:-0.41,
+       metrics:[{l:"Revenue Backlog",v:"$29B+"},{l:"EBITDA Margin",v:"~60%"},{l:"IPO Date",v:"Mar 28, 2025 @ $40"}],
+       ah:"+15%",d1o:"~$55",d1c:"~$52",net:"~+10%",
+       pre:"Stock ~$48. First earnings post-IPO (Mar 28, 2025 @ $40). Market debating valuation of AI infrastructure play with massive capex needs. OpenAI deal of $11.9B announced pre-IPO.",
+       said:"Rev $982M — massive beat vs $853M. First quarter ever reported publicly. EBITDA margin ~60%. Backlog $29B+. Raised $1.4B in IPO. OpenAI expansion deal.",
+       why:"+15% AH. Massive revenue beat set the tone. Demand for NVIDIA GPU clusters exceeding supply — CRWV positioned as pure-play beneficiary. Market pricing massive growth.",
+       upd:"First print establishes credibility. Backlog $29B vs $982M quarterly revenue = years of visibility. The business is real and scaling faster than anyone modeled at IPO."},
+      {id:"crwv-q2-25",label:"Q2 2025",date:"Aug 12, 2025",rev_est:1000,rev_act:1168,eps_est:-0.40,eps_act:-0.18,
+       metrics:[{l:"Revenue",v:"$1.17B +271% YoY"},{l:"Adj EBITDA",v:"$628M 54% margin"},{l:"Backlog",v:"$29.7B"}],
+       ah:"+8%",d1o:"~$80",d1c:"~$78",net:"~+6%",
+       pre:"Stock ~$74. Q1 momentum. Weights & Biases acquisition closed. Core Scientific merger proposed ($9B). CapEx needs growing — debt levels watched.",
+       said:"Rev $1.17B +271% YoY — beat. EBITDA $628M 54% margin. Backlog $29.7B — essentially flat. Core Scientific deal announced. Full-year 2025 guide $5.1B+.",
+       why:"+8% AH. Strong beat. However flat backlog YoY was the yellow flag analysts noted. Core Scientific deal adds $9B acquisition risk. Capex escalating rapidly.",
+       upd:"Revenue compounding at 3x+ rate is extraordinary. Flat backlog is the watch item — does demand keep pace with capacity builds? Debt-funded capex model requires sustained demand."},
+      {id:"crwv-q3-25",label:"Q3 2025",date:"Nov 10, 2025",rev_est:1320,rev_act:1365,eps_est:-0.25,eps_act:-0.10,
+       metrics:[{l:"Revenue",v:"$1.36B +134% YoY"},{l:"Backlog",v:"$55.6B +90% QoQ"},{l:"Adj EBITDA",v:"$838M 61% margin"}],
+       ah:"-6%",d1o:"~$97",d1c:"~$92",net:"~-8%",
+       pre:"Stock ~$98. Stock up 164% from IPO. Market pricing in continued massive growth. Core Scientific deal rejected by Core shareholders. Data center partner delays flagged.",
+       said:"Rev $1.36B — beat. Backlog $55.6B — nearly doubled QoQ from new OpenAI/Meta/hyperscaler deals. EBITDA 61% margin. But 2025 full-year guide $5.05-5.15B — below $5.29B consensus. Third-party DC developer delay.",
+       why:"-6% AH on guide miss. Backlog doubling was extraordinary but $5.05B guide vs $5.29B consensus triggered selling. Market punishes any miss at 15-20x forward revenue.",
+       upd:"Guide miss despite exceptional results shows the bar is extreme at this valuation. Backlog $55.6B is the long-term story. Short-term DC delays are the risk."},
+      {id:"crwv-q4-25",label:"Q4 2025",date:"Mar 2026",rev_est:1700,rev_act:null,eps_est:-0.20,eps_act:null,
+       metrics:[{l:"Rev Guidance",v:"$1.66-1.90B"},{l:"Full Year 2025",v:"$5.05-5.15B guide"},{l:"2026 CapEx",v:"2x+ 2025 capex"}],
+       ah:null,d1o:null,d1c:null,net:null,
+       pre:"2026 capex 'well in excess of double' 2025's $12-14B. DC capacity expansion ongoing. OpenAI as anchor tenant. Market watching whether revenue keeps pace with capex.",
+       said:"Update after earnings",why:"Update after earnings",upd:""}
+    ]},
+    NXT:{company:"Nextracker Inc.",sector:"Solar / Clean Energy",exchange:"NASDAQ",quarters:[
+      {id:"nxt-q1-fy24",label:"Q1 FY24",date:"Aug 2, 2023",rev_est:538,rev_act:551,eps_est:0.65,eps_act:0.78,
+       metrics:[{l:"Adj Gross Margin",v:"25.4%"},{l:"Adj EBITDA",v:"$113M 20.5%"},{l:"Backlog",v:"$3.4B"}],
+       ah:"+8%",d1o:"~$49",d1c:"~$47",net:"~+6%",
+       pre:"Stock ~$44. Fresh off IPO (Feb 2023). Market establishing what the correct multiple should be. IRA tailwinds for US solar tracker market well understood but not fully priced.",
+       said:"Rev $551M — beat. Adj EPS $0.78 vs $0.65. Adj gross margin 25.4%. Backlog $3.4B. Second earnings as public company — execution track record building.",
+       why:"+8% AH. Clean beat establishes credibility post-IPO. IRA demand driving strong backlog. Solar tracker market growing faster than anticipated.",
+       upd:"Solid inaugural execution. NXT is the dominant US solar tracker with a powerful software + hardware moat. IRA tailwind = multi-year structural growth driver."},
+      {id:"nxt-q2-fy24",label:"Q2 FY24",date:"Nov 1, 2023",rev_est:625,rev_act:666,eps_est:0.75,eps_act:1.01,
+       metrics:[{l:"Adj Gross Margin",v:"29%"},{l:"Adj EBITDA",v:"$160M 24%"},{l:"FY24 Guide Raised",v:"+$100M"}],
+       ah:"+12%",d1o:"~$57",d1c:"~$55",net:"~+10%",
+       pre:"Stock ~$50. IRA momentum accelerating. Backlog quality improving. Market starting to recognize NXT as a high-quality compounder, not just a hardware maker.",
+       said:"Rev $666M — beat +6.5%. EPS $1.01 vs $0.75 — massive beat. Adj gross margin 29% — expansion. FY24 guide raised $100M+. Backlog growing strongly.",
+       why:"+12% AH. Significant beat across all metrics. Margin expansion surprises most — market was modeling hardware-company margins, not software-enriched margins.",
+       upd:"Margin expansion from 25%→29% in one quarter is the emerging thesis: NXT is not a commoditized hardware company — its TrueCapture software and local intelligence create defensible margin premium."},
+      {id:"nxt-q3-fy24",label:"Q3 FY24",date:"Feb 7, 2024",rev_est:640,rev_act:659,eps_est:0.87,eps_act:1.08,
+       metrics:[{l:"Adj Gross Margin",v:"30%"},{l:"Adj EBITDA",v:"$167M 25.4%"},{l:"Backlog",v:"$4.2B"}],
+       ah:"+5%",d1o:"~$72",d1c:"~$70",net:"~+4%",
+       pre:"Stock ~$67. Consecutive beats building premium multiple. IRA flow-through continuing. Bar elevated now. Margin trajectory the key metric.",
+       said:"Rev $659M +3.4% — beat. EPS $1.08 vs $0.87 — beat. Adj gross margin 30% — third consecutive expansion. Backlog $4.2B growing. FY24 guidance raised again.",
+       why:"+5% AH. Third consecutive strong beat. Margin at 30% — validates software-differentiated premium. Backlog growth provides multi-quarter visibility.",
+       upd:"Three consecutive beats at expanding margins = re-rating in progress. Market pricing NXT more like a software-enabled infrastructure company than a hardware manufacturer."},
+      {id:"nxt-q4-fy24",label:"Q4 FY24",date:"May 22, 2024",rev_est:710,rev_act:737,eps_est:0.92,eps_act:1.51,
+       metrics:[{l:"FY24 Rev",v:"$2.51B +37%"},{l:"Adj Gross Margin",v:"30.2%"},{l:"FY25 Guide",v:"$2.7-2.8B"}],
+       ah:"+6%",d1o:"~$67",d1c:"~$65",net:"~+5%",
+       pre:"Stock ~$62. Full FY24 completion. FY25 guidance the key variable. Stock had pulled back from highs on broader market rotation. IRA uncertainty with election approaching.",
+       said:"Rev $737M — beat. EPS $1.51 vs $0.92 — massive beat. FY24 $2.51B +37%. FY25 guide $2.7-2.8B. Adj gross margin 30.2%.",
+       why:"+6% AH. Full year delivery + strong guidance. EPS significantly beat. Market reassured by FY25 guide despite election/IRA uncertainty.",
+       upd:"FY24 complete with consistent execution. FY25 guide solid. The key macro risk: IRA modifications from new administration. The business risk: margin sustainability as volumes scale."},
+      {id:"nxt-q1-fy25",label:"Q1 FY25",date:"Jul 31, 2024",rev_est:680,rev_act:711,eps_est:0.90,eps_act:1.11,
+       metrics:[{l:"Adj Gross Margin",v:"27.4%"},{l:"Adj EBITDA",v:"$169M"},{l:"FY25 Guide Raised",v:"$2.8-2.85B"}],
+       ah:"+8%",d1o:"~$52",d1c:"~$50",net:"~+6%",
+       pre:"Stock ~$47. Post-election IRA uncertainty weighing on solar sector broadly. NXT specifically well-positioned regardless (large US installed base). Multiple compressed.",
+       said:"Rev $711M — beat. EPS $1.11 vs $0.90 — beat. Adj gross margin 27.4%. FY25 guide raised to $2.8-2.85B. US IRA projects resilient.",
+       why:"+8% AH. Beat against a depressed multiple = powerful reaction. IRA durability commentary reassuring. Even if IRA modified, existing pipeline protected.",
+       upd:"Stock had overcorrected on macro IRA fears. Fundamentals intact. FY25 guide raise shows business momentum independent of policy uncertainty."},
+      {id:"nxt-q2-fy25",label:"Q2 FY25",date:"Oct 30, 2024",rev_est:700,rev_act:726,eps_est:0.92,eps_act:1.13,
+       metrics:[{l:"Adj Gross Margin",v:"28.8%"},{l:"FY25 Guide",v:"$2.85-2.90B"},{l:"International Mix",v:"Growing"}],
+       ah:"+5%",d1o:"~$48",d1c:"~$47",net:"~+4%",
+       pre:"Stock ~$45. Trump election impact on IRA the dominant sector narrative. NXT specifically debated — US manufacturing exposure could be protected OR hurt depending on tariff/IRA path.",
+       said:"Rev $726M +2.5% — beat. EPS $1.13 vs $0.92 — beat. Adj margin 28.8%. FY25 guide $2.85-2.90B raised. International diversification growing.",
+       why:"+5% AH. Beat despite IRA uncertainty overhang. International revenue diversification reduces IRA binary. Execution quality reassuring.",
+       upd:"International mix expanding reduces single-policy dependency. NXT is globalizing its tracker platform beyond the US. Margin durability the key watch item."},
+      {id:"nxt-q3-fy25",label:"Q3 FY25",date:"Feb 5, 2025",rev_est:640,rev_act:679,eps_est:0.90,eps_act:1.03,
+       metrics:[{l:"Adj Gross Margin",v:"36%"},{l:"Adj EBITDA Margin",v:"27.4%"},{l:"FY25 Guide",v:"$2.90-2.95B"}],
+       ah:"+7%",d1o:"~$46",d1c:"~$44",net:"~+6%",
+       pre:"Stock ~$42. Seasonal slowdown quarter (lowest Q of year). IRA narrative evolving — some project delays cited by peers. Margin trajectory the differentiation story.",
+       said:"Rev $679M — beat. EPS $1.03 vs $0.90 — beat. Adj gross margin 36% — significant expansion. EBITDA margin 27.4%. FY25 guide raised again.",
+       why:"+7% AH. Margin expansion to 36% was the surprise — beat the key thesis point that NXT is a software-enriched hardware company. Seasonal slowdown Q still beat.",
+       upd:"36% adj gross margin in a seasonally weak quarter is remarkable. TrueCapture software premium and local intelligence moat increasingly visible in margins."},
+      {id:"nxt-q4-fy25",label:"Q4 FY25",date:"May 14, 2025",rev_est:850,rev_act:924,eps_est:1.10,eps_act:1.29,
+       metrics:[{l:"FY25 Rev",v:"$3.04B +21%"},{l:"Adj Gross Margin",v:"33.4%"},{l:"Adj EBITDA",v:"$242M 26.2%"}],
+       ah:"+5%",d1o:"~$42",d1c:"~$41",net:"~+4%",
+       pre:"Stock ~$39. Full year FY25 completion. Record Q4 expected given strong order intake. FY26 guide the key variable. Margin sustainability the primary bull argument.",
+       said:"Rev $924M +26% — record Q4. Beat. EPS $1.29 vs $1.10 adj — beat. FY25 $3.04B +21%. Adj gross margin 33.4%. Adj EBITDA 26.2% margin. New eBOS business (Bentek acquisition).",
+       why:"+5% AH. Record quarter + FY25 completion above expectations + new eBOS adjacent business. Multiple challenges at current stock price.",
+       upd:"FY25 complete at $3B+. eBOS expansion into electrical balance-of-systems is a natural adjacency that could expand TAM. IRA uncertainty remains the macro overhang going into FY26."}
+    ]},
+    WMT:{company:"Walmart Inc.",sector:"Retail / E-commerce",exchange:"NYSE",quarters:[
+      {id:"wmt-q3-fy24",label:"Q3 FY24",date:"Nov 16, 2023",rev_est:159500,rev_act:160800,eps_est:0.52,eps_act:0.51,
+       metrics:[{l:"US Comp Sales",v:"+4.9%"},{l:"eCommerce",v:"+24%"},{l:"Advertising Rev",v:"+26%"}],
+       ah:"+3%",d1o:"~$55",d1c:"~$54",net:"~+2%",
+       pre:"Stock ~$53. Inflation normalization watch. Consumer trade-down dynamic benefiting WMT. eCommerce + advertising emerging as high-margin growth layers.",
+       said:"Rev $160.8B +5% — beat. Comp sales +4.9%. eCommerce +24%. Advertising +26% (high-margin). EPS slight miss on tax rate. Full-year guide raised.",
+       why:"+3% AH. Strong comp sales + eCommerce + advertising demonstrates WMT is becoming a multi-business platform company, not just a retailer.",
+       upd:"The advertising business (Walmart Connect) is the new valuation driver — high-margin, fast-growing, leverages the massive customer data asset."},
+      {id:"wmt-q4-fy24",label:"Q4 FY24",date:"Feb 20, 2024",rev_est:170800,rev_act:173400,eps_est:0.50,eps_act:0.57,
+       metrics:[{l:"US Comp Sales",v:"+4.6%"},{l:"eCommerce",v:"+23%"},{l:"FY25 Guide",v:"Revenue +4-5%"}],
+       ah:"+4%",d1o:"~$60",d1c:"~$59",net:"~+3%",
+       pre:"Stock ~$57. Full year FY24 completion. Holiday season results critical. Market pricing WMT as a defensive growth name.",
+       said:"Rev $173.4B +5.7% — beat. EPS $0.57 vs $0.50. US comp +4.6%. eCommerce +23%. FY25 guide revenue +4-5%. Dividend increase announced.",
+       why:"+4% AH. Strong holiday + dividend increase combination. FY25 guide solid. WMT re-rated as high-quality compounder with tech-layer upside.",
+       upd:"WMT executing on the retail-to-technology platform transition. Advertising + marketplace + healthcare are all high-multiple businesses growing within the WMT ecosystem."},
+      {id:"wmt-q1-fy25",label:"Q1 FY25",date:"May 16, 2024",rev_est:159800,rev_act:161500,eps_est:0.52,eps_act:0.60,
+       metrics:[{l:"US Comp Sales",v:"+4.6%"},{l:"eCommerce",v:"+22%"},{l:"Global Adv Rev",v:"+24%"}],
+       ah:"+7%",d1o:"~$68",d1c:"~$66",net:"~+6%",
+       pre:"Stock ~$63. Market recognizing WMT's transformation narrative. Stock had re-rated significantly from 2023 lows. High-income consumers trading into WMT for value.",
+       said:"Rev $161.5B +6% — beat. EPS $0.60 vs $0.52 — beat. High-income household share gains. eCommerce +22%. Global advertising +24%.",
+       why:"+7% AH. High-income consumer share gains is the new narrative — WMT is winning wallet share across all income levels, not just the value shopper.",
+       upd:"High-income consumer data point is the most important shift. It means WMT's total addressable market is expanding, not just holding share. Multiple re-rates higher."},
+      {id:"wmt-q2-fy25",label:"Q2 FY25",date:"Aug 15, 2024",rev_est:168000,rev_act:169300,eps_est:0.65,eps_act:0.67,
+       metrics:[{l:"US Comp Sales",v:"+4.2%"},{l:"eCommerce",v:"+22%"},{l:"Delivery Speed",v:"Same-day expanding"}],
+       ah:"+4%",d1o:"~$78",d1c:"~$76",net:"~+3%",
+       pre:"Stock ~$74. Re-rating well underway. Multiple expansion from 22x to 30x+ forward earnings. Bar getting higher. Membership and advertising key metrics.",
+       said:"Rev $169.3B +5% — beat. EPS $0.67. US comp +4.2%. eCommerce +22% — sustainable. Same-day delivery expanding. Flipkart gaining share in India.",
+       why:"+4% AH. Consistent execution at elevated multiple — modest but positive reaction. Premium multiple maintained. Bears running out of arguments.",
+       upd:"WMT trading at premium to historical multiple — market pricing in the tech business overlay (advertising, data, marketplace) on top of the retail floor."},
+      {id:"wmt-q3-fy25",label:"Q3 FY25",date:"Nov 19, 2024",rev_est:167700,rev_act:169600,eps_est:0.53,eps_act:0.58,
+       metrics:[{l:"US Comp Sales",v:"+4.9%"},{l:"eCommerce",v:"+27%"},{l:"Global Adv",v:"+28%"}],
+       ah:"+3%",d1o:"~$90",d1c:"~$88",net:"~+2%",
+       pre:"Stock ~$87. Stock up 60%+ YTD. Multiple at historic highs. Bar elevated. Any miss or guidance cut would be outsized negative.",
+       said:"Rev $169.6B +5.5% — beat. EPS $0.58 vs $0.53 — beat. US comp +4.9%. eCommerce +27% acceleration. Advertising +28%. Full-year guide raised.",
+       why:"+3% modest at elevated multiple. Strong beat but at 30x+ P/E every beat is partially expected. Market maintaining premium.",
+       upd:"eCommerce +27% acceleration is the new headline — WMT closing the gap with Amazon's marketplace. The advertising + commerce data moat is becoming clearer with each quarter."},
+      {id:"wmt-q4-fy25",label:"Q4 FY25",date:"Feb 20, 2025",rev_est:178500,rev_act:180600,eps_est:0.64,eps_act:0.66,
+       metrics:[{l:"US Comp Sales",v:"+4.6%"},{l:"eCommerce",v:"+16%"},{l:"FY26 Guide",v:"Revenue +3-4%"}],
+       ah:"-7%",d1o:"~$94",d1c:"~$88",net:"~-8%",
+       pre:"Stock ~$96. Full-year FY25 completion. Holiday season results watched. FY26 guidance the key — can WMT sustain premium growth rate?",
+       said:"Rev $180.6B +4.1% — beat. EPS $0.66 — beat. US comp +4.6%. eCommerce slowed to +16% (from 27%). FY26 guide +3-4% revenue — below elevated expectations.",
+       why:"-7% AH despite beating. FY26 guide below expectations + eCommerce decel from 27%→16% = double negative at elevated multiple. Tariff exposure for general merchandise also flagged.",
+       upd:"At 30x+ P/E the guide has to be exceptional. +3-4% guide implies deceleration. eCommerce 27%→16% decel is concerning. Bears making a new argument: peak re-rating, mean reversion."},
+      {id:"wmt-q1-fy26",label:"Q1 FY26",date:"May 15, 2025",rev_est:165500,rev_act:167200,eps_est:0.57,eps_act:0.61,
+       metrics:[{l:"US Comp Sales",v:"+4.5%"},{l:"eCommerce",v:"+21%"},{l:"Advertising",v:"+26%"}],
+       ah:"+5%",d1o:"~$101",d1c:"~$99",net:"~+4%",
+       pre:"Stock ~$96. Post-guide-miss recovery. Tariff impact to general merchandise watched closely. WMT well-positioned if consumers trade down amid tariff-driven inflation.",
+       said:"Rev $167.2B +4.1% — beat. EPS $0.61 vs $0.57 — beat. eCommerce rebounded to +21%. Advertising +26%. Tariff impact: WMT negotiating with suppliers, partially shielded.",
+       why:"+5% AH. eCommerce rebound from 16%→21% addressed the key decel concern. Tariff positioning as consumer value refuge resonated. Multiple partially restored.",
+       upd:"eCommerce reacceleration removes the decel narrative. Tariff environment = WMT is the beneficiary when consumers seek value. Bull case refreshed."},
+      {id:"wmt-q2-fy26",label:"Q2 FY26",date:"Aug 2025",rev_est:172500,rev_act:null,eps_est:0.69,eps_act:null,
+       metrics:[{l:"eCommerce Growth",v:"TBD"},{l:"US Comp Sales",v:"TBD"},{l:"Advertising Rev",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,pre:"",said:"",why:"",upd:""}
+    ]},
+    DOCS:{company:"Doximity Inc.",sector:"Healthcare IT",exchange:"NYSE",quarters:[
+      {id:"docs-q3-fy25",label:"Q3 FY25",date:"Feb 6, 2025",rev_est:152.8,rev_act:168.6,eps_est:0.29,eps_act:0.45,
+       metrics:[{l:"NRR (TTM)",v:"~117%"},{l:"EBITDA Margin",v:"60.5%"},{l:"AI Users",v:"610K"}],
+       ah:"+37%",d1o:"~$71",d1c:"~$68",net:"~+30%",
+       pre:"Stock ~$52. Street modeling ~$153M. Pharma ad spend recovery expected but not priced. AI engagement absent from consensus models.",
+       said:"Revenue $168.6M — beat by $15.8M (+10.4%). EPS $0.45 vs $0.29 (+55%). AI tools up 60% QoQ. 610K unique providers.",
+       why:"+37% AH. Pure consensus-was-wrong reaction. Analysts rebuilt models immediately. Market re-classified DOCS as AI beneficiary.",
+       upd:"Street reprices sharply. Models rebuilt at 20-25% growth. Multiple expands as DOCS re-classified from slow pharma-ad platform to AI workflow leader."},
+      {id:"docs-q4-fy25",label:"Q4 FY25",date:"May 15, 2025",rev_est:134.0,rev_act:138.3,eps_est:0.31,eps_act:0.38,
+       metrics:[{l:"NRR (TTM)",v:"~116% ↓"},{l:"EBITDA Margin",v:"50.4%"},{l:"AI Users",v:"580K+"}],
+       ah:"+5%",d1o:"~$78",d1c:"~$75",net:"~+4%",
+       pre:"Stock ~$75-80 near ATH. Post-surge consensus aggressive. High-conviction longs built. Bar significantly higher.",
+       said:"Revenue $138.3M vs $134M — beat but only +3.2%. EBITDA 50.4% (seasonal). Growth decelerated to 17% YoY. NRR ticked down 117%→116%.",
+       why:"Small pop ~+5%. Relief growth didn't collapse but enthusiasm muted. At elevated multiple the bar was higher.",
+       upd:"Expectations calibrated closer to reality. NRR tick-down beginning to register. Market gives benefit of doubt for one quarter."},
+      {id:"docs-q1-fy26",label:"Q1 FY26",date:"Aug 7, 2025",rev_est:143.4,rev_act:145.9,eps_est:0.34,eps_act:0.40,
+       metrics:[{l:"NRR (TTM)",v:"~115% ↓"},{l:"EBITDA Margin",v:"52%"},{l:"AI Users",v:"630K+"}],
+       ah:"Flat",d1o:"~$71",d1c:"~$70",net:"~0%",
+       pre:"Stock ~$70. Expectations normalized. Conservative guidance. Neutral market mood.",
+       said:"Revenue $145.9M vs $143.4M — small beat (+1.7%). AI suite up 5x YoY. Growth slowed to 15% YoY from 25% at peak.",
+       why:"Flat to slightly down. Market neither positively nor negatively surprised. Growth trend pointing wrong direction.",
+       upd:"NRR declining (~115%). Growth 25%→17%→15%. Market still patient but in show-me mode."},
+      {id:"docs-q2-fy26",label:"Q2 FY26",date:"Nov 6, 2025",rev_est:157.1,rev_act:168.5,eps_est:0.38,eps_act:0.45,
+       metrics:[{l:"NRR (TTM)",v:"~113% ↓"},{l:"EBITDA Margin",v:"59%"},{l:"Op Inc Beat",v:"+16%"}],
+       ah:"-12%",d1o:"~$58",d1c:"~$50",net:"~-25%",
+       pre:"Stock ~$65. Multiple still elevated (~50x fwd P/E). Bar high relative to where fundamentals are trending.",
+       said:"Revenue $168.5M vs $157.1M — solid beat (+7.2%). EPS $0.45 vs $0.38 (+18.7%). But growth inflated by easy comps. NRR still declining.",
+       why:"Fell -12% AH, ultimately -25% from pre-earnings. A 7% beat at 50x P/E isn't enough when every thesis metric is heading the wrong way.",
+       upd:"Critical inflection. Market signals it has priced out the AI re-rating. Bears in control."},
+      {id:"docs-q3-fy26",label:"Q3 FY26",date:"Feb 5, 2026",rev_est:178.0,rev_act:185.1,eps_est:0.45,eps_act:0.46,
+       metrics:[{l:"NRR (TTM)",v:"112% ↓↓"},{l:"EBITDA Margin",v:"60%"},{l:"Q4 Guide",v:"$143M (4%)"}],
+       ah:"-5% AH → -25% D+1",d1o:"~$35",d1c:"~$25",net:"~-28%",
+       pre:"Stock ~$37 — down 55% from ATH. Sellside still had buy ratings. Market partially discounted bad news but hadn't priced a guidance cut.",
+       said:"Revenue $185.1M — beat. EPS $0.46 vs $0.45 — beat. But Q4 guidance: $143-144M (4% growth) vs implied ~$175M. MFN agreements disrupted pharma selling season.",
+       why:"-5% initial AH, then -25% to -28% next trading day. Analysts slashed targets: Goldman $46→$34, BMO $45→$25, Evercore $55→$30.",
+       upd:"Expectation lifecycle complete. NRR at 112% and declining. Key question: cyclical MFN disruption or structural pharma budget contraction?"},
+      {id:"docs-q4-fy26",label:"Q4 FY26",date:"May 2026",rev_est:143,rev_act:null,eps_est:0.28,eps_act:null,
+       metrics:[{l:"NRR (TTM)",v:"TBD"},{l:"EBITDA Margin",v:"TBD"},{l:"Pharma Bookings",v:"TBD"}],
+       ah:null,d1o:null,d1c:null,net:null,pre:"",said:"",why:"",upd:""}
+    ]}
+  }
+};
+
+const SB_URL="https://bgoemzcpwojjtwgqjyqc.supabase.co";
+const SB_KEY="sb_publishable_SE7b_ErBfPbJd8WWsdORig_0hA2T4_F";
+const SB_HDR={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
+const SK="eq_v3",AK="eq_api";
+const lsSave=d=>{try{localStorage.setItem(SK,JSON.stringify(d))}catch{}};
+const lsLoad=()=>{try{const d=localStorage.getItem(SK);return d?JSON.parse(d):null}catch{return null}};
+const getKey=()=>localStorage.getItem(AK)||"";
+const saveKey=k=>localStorage.setItem(AK,k);
+const cloudLoad=async()=>{
+  try{
+    const r=await fetch(SB_URL+"/rest/v1/research_data?id=eq.user_data&select=data",{headers:SB_HDR});
+    const rows=await r.json();
+    if(rows&&rows.length>0&&rows[0].data&&rows[0].data.tickerOrder){
+      const cd=rows[0].data;
+      // Merge any SEED tickers missing from cloud — preserves all user edits
+      let changed=false;
+      for(const t of SEED.tickerOrder){
+        if(!cd.tickers[t]){
+          cd.tickers[t]=SEED.tickers[t];
+          if(!cd.tickerOrder.includes(t)){cd.tickerOrder.unshift(t);}
+          changed=true;
+        }
+      }
+      if(changed)cloudSave(cd); // write merged data back async
+      return cd;
+    }
+  }catch(e){console.warn("Cloud load failed",e)}
+  return null;
+};
+const cloudSave=async(d)=>{try{await fetch(SB_URL+"/rest/v1/research_data",{method:"POST",headers:{...SB_HDR,"Prefer":"resolution=merge-duplicates"},body:JSON.stringify({id:"user_data",data:d,updated_at:new Date().toISOString()})});}catch(e){console.warn("Cloud save failed",e)};};
+
+const bm=(e,a)=>{if(e==null||a==null)return null;const d=a-e,p=((d/Math.abs(e))*100).toFixed(1);return{diff:d.toFixed(1),pct:p,pos:d>=0}};
+const rxnCls=v=>{if(!v)return"rxn-neu";const s=String(v);if(s.includes("+"))return"rxn-pos";if(s.startsWith("-")||s.includes("–"))return"rxn-neg";return"rxn-neu"};
+
+const Chip=({l,v,beat})=>(
+  <div className={beat===true?"chip ok":beat===false?"chip no":"chip"}>
+    <div className="cl">{l}</div>
+    <div className="cv">{v||"—"}</div>
+  </div>
+);
+
+const NoteBlock=({label,text})=>text?(
+  <div className="note-blk">
+    <div className="note-lbl">{label}</div>
+    <div className="note-txt">{text}</div>
+  </div>
+):null;
+
+const Modal=({title,onClose,children})=>(
+  <div className="overlay" onClick={onClose}>
+    <div className="sheet" onClick={e=>e.stopPropagation()}>
+      <div className="sheet-hdr">
+        <span style={{fontWeight:700,fontSize:15,color:"#fff"}}>{title}</span>
+        <button className="sheet-close" onClick={onClose}>×</button>
+      </div>
+      <div className="sheet-body">{children}</div>
+    </div>
+  </div>
+);
+
+const Field=({label,k,ph,s,ss,type="text",optional})=>(
+  <div className="field">
+    <label className="lbl">{label}{optional&&<span style={{color:"var(--s5)",marginLeft:4}}>optional</span>}</label>
+    <input type={type} value={s[k]||""} onChange={e=>ss(x=>({...x,[k]:e.target.value}))} placeholder={ph} className="inp"/>
+  </div>
+);
+
+const AreaField=({label,k,ph,s,ss,optional})=>(
+  <div className="field">
+    <label className="lbl">{label}{optional&&<span style={{color:"var(--s5)",marginLeft:4}}>optional</span>}</label>
+    <textarea value={s[k]||""} onChange={e=>ss(x=>({...x,[k]:e.target.value}))} placeholder={ph} rows={2} className="inp area"/>
+  </div>
+);
+
+function App(){
+  const [data,setData]=useState(null);
+  const [view,setView]=useState("dash");
+  const [sym,setSym]=useState(null);
+  const [open,setOpen]=useState({});
+  const [editing,setEditing]=useState(null);
+  const [draft,setDraft]=useState({});
+  const [thesisEdit,setThesisEdit]=useState(false);
+  const [thesisDraft,setThesisDraft]=useState("");
+  const [live,setLive]=useState({});
+  const [busy,setBusy]=useState(null);
+  const [modal,setModal]=useState(null);
+  const [apiKey,setApiKey]=useState(getKey);
+  const [newT,setNewT]=useState({symbol:"",company:"",sector:"",exchange:"NASDAQ"});
+  const [newQ,setNewQ]=useState({});
+  const [autoFilling,setAutoFilling]=useState(false);
+
+  const [syncing,setSyncing]=useState(false);
+  const [syncOk,setSyncOk]=useState(null); // null=init, true=ok, false=err
+
+  useEffect(()=>{
+    (async()=>{
+      // Show cached data instantly
+      const cached=lsLoad();
+      if(cached)setData(cached);
+      // Then load from cloud (authoritative)
+      setSyncing(true);
+      const cloud=await cloudLoad();
+      if(cloud){setData(cloud);lsSave(cloud);setSyncOk(true);}
+      else if(!cached){setData(SEED);}
+      else{setSyncOk(true);} // cloud unavailable but we have cache
+      setSyncing(false);
+    })();
+  },[]);
+
+  const persist=async(d)=>{
+    setData(d);lsSave(d);
+    setSyncing(true);
+    await cloudSave(d);
+    setSyncOk(true);setSyncing(false);
+  };
+  const toggle=id=>setOpen(o=>({...o,[id]:!o[id]}));
+  const startEdit=q=>{setEditing(q.id);setDraft({pre:q.pre||"",said:q.said||"",why:q.why||"",upd:q.upd||""})};
+  const saveEdit=(ticker,qid)=>{
+    const d=JSON.parse(JSON.stringify(data));
+    const i=d.tickers[ticker].quarters.findIndex(q=>q.id===qid);
+    d.tickers[ticker].quarters[i]={...d.tickers[ticker].quarters[i],...draft};
+    persist(d);setEditing(null);
+  };
+  const saveThesis=(ticker)=>{
+    const d=JSON.parse(JSON.stringify(data));
+    d.tickers[ticker].thesis=thesisDraft;
+    persist(d);setThesisEdit(false);
+  };
+
+  const callProxy=async(payload)=>{
+    // Direct Anthropic call — anthropic-dangerous-direct-browser-access header
+    // enables CORS from any origin without needing a proxy
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKey.trim(),
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const t=await res.text();
+      let msg=t.slice(0,200);
+      try{const e=JSON.parse(t);msg=e.error?.message||msg;}catch{}
+      throw new Error(`API error ${res.status}: ${msg}`);
+    }
+    const r=await res.json();
+    if(r.type==="error") throw new Error(r.error?.message||JSON.stringify(r.error));
+    const txt=(r.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+    if(!txt) throw new Error(`No text in response. Model: ${r.model||"?"}, stop: ${r.stop_reason||"?"}`);
+    return txt;
+  };
+
+  const doRefresh=async(ticker)=>{
+    if(!apiKey.trim()){setModal("settings");return}
+    setBusy(ticker);
+    try{
+      const txt=await callProxy({
+        model:"claude-sonnet-4-6",max_tokens:800,
+        tools:[{type:"web_search_20250305",name:"web_search"}],
+        system:"Return ONLY valid JSON, no markdown, no explanation.",
+        messages:[{role:"user",content:
+          `${ticker} stock: current price, day change%, 52w high/low, market cap, 3 recent news headlines. JSON only: {"price":"","change":"","high52":"","low52":"","mktcap":"","headlines":["","",""]}`
+        }]
+      });
+      const parsed=JSON.parse(txt.replace(/```[a-z]*|```/g,"").trim());
+      setLive(l=>({...l,[ticker]:{...parsed,at:new Date().toLocaleTimeString()}}));
+    }catch(e){
+      console.error("Refresh error:",e);
+      setLive(l=>({...l,[ticker]:{error:e.message,at:new Date().toLocaleTimeString()}}));
+    }finally{setBusy(null)}
+  };
+
+  const [updating,setUpdating]=useState(false);
+  const [updateMsg,setUpdateMsg]=useState(null);
+
+  const doEarningsUpdate=async(ticker)=>{
+    if(!apiKey.trim()){setModal("settings");return}
+    setUpdating(true);
+    setUpdateMsg("Searching for latest earnings...");
+    try{
+      const res_=await callProxy({
+          model:"claude-sonnet-4-6",max_tokens:1000,
+          tools:[{type:"web_search_20250305",name:"web_search"}],
+          system:"You are a financial data assistant. Search for the most recent quarterly earnings for the given ticker. Return ONLY valid JSON, no markdown, no explanation, no code fences.",
+          messages:[{role:"user",content:
+            `Latest earnings for ${ticker}: quarter, date, rev est/actual ($M), non-GAAP EPS est/actual, AH reaction, D+1 open/close, 48h net, 3 key metrics, pre-earnings narrative, what results showed, why stock reacted, thesis update. JSON only: {"label":"","date":"","rev_est":0,"rev_act":0,"eps_est":0,"eps_act":0,"m1l":"","m1v":"","m2l":"","m2v":"","m3l":"","m3v":"","ah":"","d1o":"","d1c":"","net":"","pre":"","said":"","why":"","upd":""}`
+          }]
+        })
+      const q=JSON.parse(res_.replace(/```[a-z]*|```/g,"").trim());
+
+      // Build new quarter object
+      const newQ={
+        id:`${ticker}-${Date.now()}`,
+        label:q.label,date:q.date,
+        rev_est:q.rev_est?+q.rev_est:null,
+        rev_act:q.rev_act?+q.rev_act:null,
+        eps_est:q.eps_est?+q.eps_est:null,
+        eps_act:q.eps_act?+q.eps_act:null,
+        metrics:[{l:q.m1l||"Metric 1",v:q.m1v||""},{l:q.m2l||"Metric 2",v:q.m2v||""},{l:q.m3l||"Metric 3",v:q.m3v||""}],
+        ah:q.ah||null,d1o:q.d1o||null,d1c:q.d1c||null,net:q.net||null,
+        pre:q.pre||"",said:q.said||"",why:q.why||"",upd:q.upd||""
+      };
+
+      // Check if this quarter already exists — update it, else add it
+      const d=JSON.parse(JSON.stringify(data));
+      const quarters=d.tickers[ticker].quarters;
+      const existIdx=quarters.findIndex(x=>x.label===newQ.label);
+      if(existIdx>=0){
+        // Merge — preserve user notes if they exist, update financial data
+        const existing=quarters[existIdx];
+        quarters[existIdx]={
+          ...newQ,
+          id:existing.id,
+          pre:existing.pre||newQ.pre,
+          said:existing.said||newQ.said,
+          why:existing.why||newQ.why,
+          upd:existing.upd||newQ.upd,
+        };
+        setUpdateMsg(`✓ Updated ${newQ.label} for ${ticker}`);
+      } else {
+        quarters.push(newQ);
+        setUpdateMsg(`✓ Added ${newQ.label} for ${ticker}`);
+      }
+      await persist(d);
+      setTimeout(()=>setUpdateMsg(null),4000);
+    }catch(e){
+      setUpdateMsg("✗ Update failed — try again");
+      setTimeout(()=>setUpdateMsg(null),4000);
+    }finally{setUpdating(false)}
+  };
+
+  // Smart next-quarter inference
+  const inferNextQ=(ticker)=>{
+    const qs=data.tickers[ticker]?.quarters||[];
+    if(!qs.length)return{};
+    const last=qs[qs.length-1];
+    const lbl=last.label||'';
+    // Calendar: "Q3 2025"
+    const cal=lbl.match(/Q(\d)\s+(\d{4})/i);
+    if(cal){
+      let q=parseInt(cal[1]),y=parseInt(cal[2]);
+      q++;if(q>4){q=1;y++;}
+      const mo=['','Apr/May','Jul/Aug','Oct/Nov','Jan/Feb'];
+      const yr=q===1?y+1:y;
+      return{label:`Q${q} ${yr}`,date:`${mo[q]} ${yr}`};
+    }
+    // Fiscal: "Q3 FY25" or "Q3 FY2025"
+    const fy=lbl.match(/Q(\d)\s+FY(\d+)/i);
+    if(fy){
+      let q=parseInt(fy[1]),s=fy[2],n=parseInt(s);
+      q++;if(q>4){q=1;n=s.length<=2?(n+1)%100:n+1;s=s.length<=2?n.toString().padStart(2,'0'):n.toString();}
+      return{label:`Q${q} FY${s}`};
+    }
+    return{};
+  };
+
+  const [autoFillMsg,setAutoFillMsg]=useState(null);
+
+  const autoFillQuarter=async(label,ticker_sym)=>{
+    const key=apiKey.trim();
+    if(!key){setAutoFillMsg("⚙ Add API key in Settings first");return;}
+    if(!label||!ticker_sym)return;
+    const co=data.tickers[ticker_sym]?.company||ticker_sym;
+    setAutoFilling(true);
+    setAutoFillMsg(null);
+    try{
+      const txt_=await callProxy({
+        model:"claude-sonnet-4-6",max_tokens:1000,
+        tools:[{type:"web_search_20250305",name:"web_search"}],
+        system:"You are a financial data assistant. Always return ONLY a single valid JSON object. No markdown, no explanation, no code fences. If you cannot find data for a field, use null.",
+        messages:[{role:"user",content:
+          `${co} (${ticker_sym}) ${label} earnings: date, rev est/actual ($M), non-GAAP EPS est/actual, AH%, D+1 open/close, 48h net, 3 key metrics, pre-earnings context, results summary, stock reaction reason, thesis update. JSON: {"date":"","rev_est":0,"rev_act":0,"eps_est":0,"eps_act":0,"m1l":"","m1v":"","m2l":"","m2v":"","m3l":"","m3v":"","ah":"","d1o":"","d1c":"","net":"","pre":"","said":"","why":"","upd":""}`
+        }]
+      });
+      // Parse — handle cases where model wraps in markdown despite instructions
+      let clean=txt_.trim();
+      const jsonMatch=clean.match(/\{[\s\S]*\}/);
+      if(!jsonMatch) throw new Error("No JSON found in response");
+      const q=JSON.parse(jsonMatch[0]);
+      setNewQ(prev=>({
+        ...prev,
+        date:q.date||prev.date||"",
+        rev_est:q.rev_est!=null?+q.rev_est:prev.rev_est,
+        rev_act:q.rev_act!=null?+q.rev_act:prev.rev_act,
+        eps_est:q.eps_est!=null?+q.eps_est:prev.eps_est,
+        eps_act:q.eps_act!=null?+q.eps_act:prev.eps_act,
+        m1l:q.m1l||prev.m1l||"",m1v:q.m1v||prev.m1v||"",
+        m2l:q.m2l||prev.m2l||"",m2v:q.m2v||prev.m2v||"",
+        m3l:q.m3l||prev.m3l||"",m3v:q.m3v||prev.m3v||"",
+        ah:q.ah||prev.ah||"",d1o:q.d1o||prev.d1o||"",
+        d1c:q.d1c||prev.d1c||"",net:q.net||prev.net||"",
+        pre:q.pre||prev.pre||"",said:q.said||prev.said||"",
+        why:q.why||prev.why||"",upd:q.upd||prev.upd||"",
+      }));
+      setAutoFillMsg("✓ Filled — review and save");
+    }catch(e){
+      console.error("Auto-fill error:",e);
+      setAutoFillMsg("✗ "+e.message.slice(0,80));
+    }
+    finally{setAutoFilling(false);}
+  };
+
+  const deleteQuarter=(ticker,qid)=>{
+    const d=JSON.parse(JSON.stringify(data));
+    d.tickers[ticker].quarters=d.tickers[ticker].quarters.filter(q=>q.id!==qid);
+    persist(d);
+  };
+
+  const exportData=()=>{
+    const json=JSON.stringify(data,null,2);
+    const blob=new Blob([json],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`research-tracker-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importData=(file)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const d=JSON.parse(e.target.result);
+        if(!d.tickerOrder||!d.tickers) throw new Error("Invalid file");
+        persist(d);
+        setModal(null);
+        alert("Data imported successfully!");
+      }catch(err){alert("Import failed: "+err.message);}
+    };
+    reader.readAsText(file);
+  };
+
+  const addTicker=()=>{
+    const s=newT.symbol.toUpperCase().trim();if(!s)return;
+    persist({...data,tickerOrder:[...data.tickerOrder,s],
+      tickers:{...data.tickers,[s]:{company:newT.company,sector:newT.sector,exchange:newT.exchange,quarters:[]}}});
+    setModal(null);setNewT({symbol:"",company:"",sector:"",exchange:"NASDAQ"});
+  };
+
+  const addQuarter=()=>{
+    if(!newQ.label)return;
+    const q={id:`${sym}-${Date.now()}`,label:newQ.label,date:newQ.date||"",
+      rev_est:newQ.rev_est?+newQ.rev_est:null,rev_act:newQ.rev_act?+newQ.rev_act:null,
+      eps_est:newQ.eps_est?+newQ.eps_est:null,eps_act:newQ.eps_act?+newQ.eps_act:null,
+      metrics:[{l:newQ.m1l||"Metric 1",v:newQ.m1v||""},{l:newQ.m2l||"Metric 2",v:newQ.m2v||""},{l:newQ.m3l||"Metric 3",v:newQ.m3v||""}],
+      ah:newQ.ah||null,d1o:newQ.d1o||null,d1c:newQ.d1c||null,net:newQ.net||null,
+      pre:newQ.pre||"",said:newQ.said||"",why:newQ.why||"",upd:newQ.upd||""};
+    const d=JSON.parse(JSON.stringify(data));
+    d.tickers[sym].quarters.push(q);
+    persist(d);setModal(null);setNewQ({});
+  };
+
+  if(!data)return(
+    <div className="page" style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <span style={{color:"var(--nv)",fontFamily:"ui-monospace,monospace",fontSize:13,letterSpacing:".2em"}} className="pulse">LOADING...</span>
+    </div>
+  );
+
+  const ticker=sym?data.tickers[sym]:null;
+  const ld=live[sym]||{};
+
+  /* DASHBOARD */
+  if(view==="dash")return(
+    <div className="page">
+      <div className="top-bar safe-top safe-x">
+        <div className="wrap row sb" style={{paddingTop:12,paddingBottom:12}}>
+          <div>
+            <div className="brand-label">EQUITY RESEARCH</div>
+            <div className="brand-title">Coverage</div>
+          </div>
+          <div className="row gap" style={{alignItems:"flex-end",paddingBottom:2}}>
+            <button className="btn-icon" onClick={()=>setModal("settings")}>⚙</button>
+            <span title={syncing?"Saving...":syncOk===false?"Sync error":"Saved to cloud"}
+              style={{display:"inline-block",width:8,height:8,borderRadius:"50%",marginRight:4,
+                background:syncing?"#f59e0b":syncOk===false?"#ef4444":"#22c55e",
+                boxShadow:syncing?"0 0 6px #f59e0b":syncOk===false?"0 0 6px #ef4444":"0 0 6px #22c55e"}}/>
+            <button className="btn ac sm" onClick={()=>setModal("ticker")}>+ Ticker</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="wrap safe-x safe-bot" style={{paddingTop:16}}>
+        <div className="stack">
+          {data.tickerOrder.map(s=>{
+            const t=data.tickers[s];if(!t)return null;
+            const done=t.quarters.filter(q=>q.rev_act!=null);
+            const last=done[done.length-1];
+            return(
+              <button key={s} className="ticker-card fade" onClick={()=>{setSym(s);setView("ticker")}}>
+                <div className="row sb mb2">
+                  <div>
+                    <div style={{fontSize:20,fontWeight:700,color:"var(--navy)"}}>{s}</div>
+                    <div style={{fontSize:12,color:"var(--s4)",marginTop:2}}>{t.company}</div>
+                  </div>
+                  {last?.ah&&<span className={`rxn-tag ${rxnCls(last.ah)}`}>{last.ah}</span>}
+                </div>
+                <div className="row gap" style={{flexWrap:"wrap"}}>
+                  <span style={{fontSize:11,background:"var(--pl2)",color:"var(--mid)",padding:"3px 8px",borderRadius:6,border:"1px solid var(--pl)"}}>{t.sector}</span>
+                  <span style={{fontSize:11,color:"var(--s4)"}}>{t.exchange}</span>
+                  <span style={{fontSize:11,color:"var(--s5)",marginLeft:"auto"}}>{t.quarters.length} quarters</span>
+                </div>
+                {last&&<div style={{fontSize:11,color:"var(--s5)",marginTop:8}}>Latest: {last.label} · {last.date}</div>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {modal==="ticker"&&(
+        <Modal title="Add Ticker" onClose={()=>setModal(null)}>
+          <Field label="Ticker Symbol" k="symbol" ph="RKLB" s={newT} ss={setNewT}/>
+          <Field label="Company Name" k="company" ph="Rocket Lab Corp." s={newT} ss={setNewT}/>
+          <Field label="Sector" k="sector" ph="Aerospace" s={newT} ss={setNewT}/>
+          <Field label="Exchange" k="exchange" ph="NASDAQ" s={newT} ss={setNewT}/>
+          <div className="row gap mt4">
+            <button className="btn ac f1" onClick={addTicker}>Add</button>
+            <button className="btn ghost f1" onClick={()=>setModal(null)}>Cancel</button>
+          </div>
+        </Modal>
+      )}
+
+      {modal==="settings"&&(
+        <Modal title="Settings" onClose={()=>setModal(null)}>
+          <p style={{fontSize:12,color:"var(--s4)",lineHeight:1.6,marginBottom:14}}>
+            Your Anthropic API key powers live price and news refresh. Stored only on this device.
+            Get your key at console.anthropic.com.
+          </p>
+          <div className="field">
+            <label className="lbl">Anthropic API Key</label>
+            <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="sk-ant-..." className="inp"/>
+          </div>
+          <div className="row gap mt3">
+            <button className="btn ac f1" onClick={()=>{saveKey(apiKey);setModal(null)}}>Save Key</button>
+            <button className="btn ghost f1" onClick={()=>setModal(null)}>Cancel</button>
+          </div>
+          <hr style={{border:"none",borderTop:"1px solid var(--s6)",margin:"16px 0"}}/>
+          <div style={{fontSize:11,fontWeight:700,color:"var(--s4)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:10}}>Data Backup</div>
+          <div className="row gap">
+            <button className="btn ac sm f1" style={{background:"var(--ok-t)"}} onClick={exportData}>⬇ Export JSON</button>
+            <label className="btn ghost sm f1" style={{textAlign:"center",cursor:"pointer"}}>
+              ⬆ Import JSON
+              <input type="file" accept=".json" style={{display:"none"}} onChange={e=>e.target.files[0]&&importData(e.target.files[0])}/>
+            </label>
+          </div>
+          <p style={{fontSize:11,color:"var(--s5)",marginTop:8,lineHeight:1.5}}>
+            Export saves all your notes, thesis, and quarter data as a JSON file. Import restores from a previous export.
+          </p>
+        </Modal>
+      )}
+    </div>
+  );
+
+  /* TICKER VIEW */
+  const quarters=[...(ticker?.quarters||[])].reverse();
+  return(
+    <div className="page">
+      <div className="top-bar sticky safe-top safe-x">
+        <div className="wrap" style={{paddingTop:10,paddingBottom:10}}>
+          <div className="row sb mb2">
+            <div className="row">
+              <button className="bc-back" onClick={()=>setView("dash")}>← Coverage</button>
+              <span className="bc-sep">/</span>
+              <span className="bc-sym">{sym}</span>
+            </div>
+            <div className="row gap">
+              <button className="btn-refresh" onClick={()=>doRefresh(sym)} disabled={busy===sym}>
+                {busy===sym?"...":"⟳ Refresh"}
+              </button>
+              <button className="btn-refresh" style={{background:updating?"#fef9ec":"#fff",borderColor:updating?"#f59e0b":"var(--s6)",color:"var(--nv)",marginLeft:0}}
+                onClick={()=>doEarningsUpdate(sym)} disabled={updating||busy===sym}
+                title="Auto-fetch latest earnings results">
+                {updating?"⏳":"📊"} Earnings
+              </button>
+              <button className="btn ac sm" style={{fontWeight:700}} onClick={()=>{
+                const sugg=inferNextQ(sym);
+                setNewQ(sugg);
+                setModal("quarter");
+                if(sugg.label)setTimeout(()=>autoFillQuarter(sugg.label,sym),80);
+              }}>+ Quarter</button>
+            </div>
+          </div>
+          <div className="row sb">
+            <div>
+              <div style={{fontWeight:700,color:"var(--navy)"}}>{ticker.company}</div>
+              <div style={{fontSize:12,color:"var(--s4)"}}>{ticker.exchange} · {ticker.sector}</div>
+            </div>
+            {ld.price&&!ld.error&&(
+              <div style={{textAlign:"right"}}>
+                <div className="row base">
+                  <span className="live-price">${ld.price}</span>
+                  <span className={ld.change?.includes("-")?"chg-neg":"chg-pos"}>{ld.change}</span>
+                </div>
+                {ld.high52&&<div className="live-sub">52w ${ld.low52}–${ld.high52}</div>}
+                <div className="live-sub">{ld.at}</div>
+              </div>
+            )}
+            {ld.error&&<div style={{fontSize:11,color:"var(--no-t)",textAlign:"right",maxWidth:180}}>{ld.error}</div>}
+          </div>
+        </div>
+      </div>
+
+      <div className="wrap safe-x safe-bot" style={{paddingTop:12}}>
+        <div className="stack">
+
+          {/* Thesis box */}
+          <div className="thesis-card">
+            <div className="thesis-head">
+              <span className="thesis-label">Investment Thesis</span>
+              {!thesisEdit&&(
+                <button className="btn-edit" style={{marginTop:0}}
+                  onClick={()=>{setThesisDraft(ticker.thesis||"");setThesisEdit(true)}}>
+                  ✏ Edit
+                </button>
+              )}
+            </div>
+            {thesisEdit?(
+              <div>
+                <textarea className="thesis-area"
+                  value={thesisDraft}
+                  onChange={e=>setThesisDraft(e.target.value)}
+                  placeholder="Write your full thesis here — root need, key variables to watch, bull/bear cases, valuation framework, what would change your view..."
+                />
+                <div className="row gap" style={{padding:"0 14px 14px"}}>
+                  <button className="btn ac sm" style={{fontWeight:700}} onClick={()=>saveThesis(sym)}>Save</button>
+                  <button className="btn ghost sm" onClick={()=>setThesisEdit(false)}>Cancel</button>
+                </div>
+              </div>
+            ):(
+              <div className={`thesis-body${!ticker.thesis?" empty":""}`}>
+                {ticker.thesis||"No thesis yet — tap Edit to add your research and investment view."}
+              </div>
+            )}
+          </div>
+          {updateMsg&&(
+            <div style={{background:updateMsg.startsWith("✓")?"var(--ok-bg)":updateMsg.startsWith("✗")?"var(--no-bg)":"var(--amber-bg)",
+              border:"1px solid",borderColor:updateMsg.startsWith("✓")?"var(--ok-bd)":updateMsg.startsWith("✗")?"var(--no-bd)":"var(--amber-bd)",
+              borderRadius:10,padding:"10px 14px",fontSize:13,fontWeight:600,
+              color:updateMsg.startsWith("✓")?"var(--ok-t)":updateMsg.startsWith("✗")?"var(--no-t)":"var(--amber-t)"}}
+              className="fade">
+              {updateMsg}
+            </div>
+          )}
+          {ld.headlines&&(
+            <div className="news-card fade">
+              <div className="news-lbl">Recent News</div>
+              {ld.headlines.map((h,i)=><div key={i} className="news-item">{h}</div>)}
+            </div>
+          )}
+
+          {quarters.map(q=>{
+            const pending=q.rev_act==null;
+            const isOpen=open[q.id];
+            const isEdit=editing===q.id;
+            const revBM=bm(q.rev_est,q.rev_act);
+            const epsBM=bm(q.eps_est,q.eps_act);
+            const hasNotes=q.pre||q.said||q.why||q.upd;
+
+            return(
+              <div key={q.id} className={`card${pending?" upcoming":""} fade`}>
+                <div className={`card-head${pending?" upcoming":""}`}>
+                  <div className="row gap">
+                    <span style={{fontWeight:700,color:pending?"var(--nv)":"var(--navy)"}}>{q.label}</span>
+                    <span style={{fontSize:12,color:"var(--s4)"}}>{q.date}</span>
+                    {pending&&<span style={{fontSize:11,background:"var(--pl2)",color:"var(--mid)",border:"1px solid var(--pl)",padding:"2px 8px",borderRadius:999}}>Upcoming</span>}
+                  </div>
+                  <div className="row gap">
+                    {q.ah&&<span className={`rxn-tag ${rxnCls(q.ah)}`}>{q.ah}</span>}
+                    <button onClick={()=>deleteQuarter(sym,q.id)}
+                      style={{fontSize:13,color:"var(--s5)",padding:"2px 6px",borderRadius:5,
+                        lineHeight:1,background:"none",border:"1px solid transparent",transition:".15s",marginLeft:2}}
+                      onMouseEnter={e=>{e.target.style.color="var(--no-t)";e.target.style.borderColor="var(--no-bd)";e.target.style.background="var(--no-bg)"}}
+                      onMouseLeave={e=>{e.target.style.color="var(--s5)";e.target.style.borderColor="transparent";e.target.style.background="none"}}
+                      title="Delete quarter">🗑</button>
+                  </div>
+                </div>
+
+                <div className="card-body">
+                  <div className="grid2 mb2">
+                    <Chip l="Rev Est ($M)" v={q.rev_est?`$${q.rev_est}M`:null}/>
+                    <Chip l="Rev Actual ($M)" v={q.rev_act?`$${q.rev_act}M`:null}/>
+                    <Chip l="Rev Beat/Miss"
+                      v={revBM?`${revBM.pos?"+":""}${revBM.diff}M (${revBM.pos?"+":""}${revBM.pct}%)`:null}
+                      beat={revBM?revBM.pos:null}/>
+                    <Chip l="EPS Beat/Miss"
+                      v={epsBM?`${epsBM.pos?"+":""}$${epsBM.diff} (${epsBM.pos?"+":""}${epsBM.pct}%)`:null}
+                      beat={epsBM?epsBM.pos:null}/>
+                  </div>
+
+                  <div className="grid3 mb2">
+                    {q.metrics.map((m,i)=><Chip key={i} l={m.l} v={m.v}/>)}
+                  </div>
+
+                  {!pending&&(
+                    <div className="grid2 mb2">
+                      {[["AH Reaction",q.ah,true],["D+1 Open",q.d1o,false],["D+1 Close",q.d1c,false],["48h Net",q.net,true]].map(([lbl,val,col])=>{
+                        const rc=col&&val?rxnCls(val):"";
+                        const cls=rc==="rxn-pos"?"chip ok":rc==="rxn-neg"?"chip no":"chip";
+                        const style=rc==="rxn-neu"?{background:"var(--pl2)",borderColor:"var(--pl)"}:{};
+                        return(
+                          <div key={lbl} className={cls} style={style}>
+                            <div className="cl">{lbl}</div>
+                            <div className="cv" style={(!col||!val)?{color:"#94a3b8"}:{}}>{val||"—"}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <button className="btn-expand" onClick={()=>toggle(q.id)}>
+                    <span>{isOpen?"▲":"▼"}</span>
+                    <span>{isOpen?"Hide Notes":hasNotes?"View Notes":"Add Notes"}</span>
+                  </button>
+                </div>
+
+                {isOpen&&(
+                  <div className="notes-area fade">
+                    {isEdit?(
+                      <div className="stack8">
+                        {[["pre","Pre-Earnings Narrative"],["said","What the Quarter Said"],["why","Why Market Reacted"],["upd","Thesis Update"]].map(([k,lbl])=>(
+                          <div key={k}>
+                            <label className="lbl" style={{color:"var(--nv)"}}>{lbl}</label>
+                            <textarea value={draft[k]||""} onChange={e=>setDraft(d=>({...d,[k]:e.target.value}))} rows={3}
+                              className="edit-area" style={{fontSize:14}}/>
+                          </div>
+                        ))}
+                        <div className="row gap pt2">
+                          <button className="btn ac sm" style={{fontWeight:700}} onClick={()=>saveEdit(sym,q.id)}>Save</button>
+                          <button className="btn ghost sm" onClick={()=>setEditing(null)}>Cancel</button>
+                        </div>
+                      </div>
+                    ):(
+                      <div>
+                        <NoteBlock label="Pre-Earnings Narrative" text={q.pre}/>
+                        <NoteBlock label="What the Quarter Said"   text={q.said}/>
+                        <NoteBlock label="Why Market Reacted"      text={q.why}/>
+                        <NoteBlock label="Thesis Update"           text={q.upd}/>
+                        {!hasNotes&&<div style={{fontSize:12,color:"var(--s5)",fontStyle:"italic"}}>No notes yet.</div>}
+                        <button className="btn-edit" onClick={()=>startEdit(q)}>✏ Edit Notes</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {modal==="quarter"&&(
+        <Modal title={`Add Quarter — ${sym}`} onClose={()=>{setModal(null);setAutoFilling(false);}}>
+          {(autoFilling||autoFillMsg)&&(
+            <div style={{
+              background:autoFillMsg?.startsWith("✓")?"var(--ok-bg)":autoFillMsg?.startsWith("✗")?"var(--no-bg)":"#fffbeb",
+              border:"1px solid",
+              borderColor:autoFillMsg?.startsWith("✓")?"var(--ok-bd)":autoFillMsg?.startsWith("✗")?"var(--no-bd)":"#fcd34d",
+              borderRadius:8,padding:"10px 14px",marginBottom:12,fontSize:13,fontWeight:600,
+              color:autoFillMsg?.startsWith("✓")?"var(--ok-t)":autoFillMsg?.startsWith("✗")?"var(--no-t)":"#d97706",
+              display:"flex",alignItems:"center",gap:8}}>
+              {autoFilling&&<span className="pulse">⏳</span>}
+              <span>{autoFilling?`Searching for ${newQ.label||""} data...`:autoFillMsg}</span>
+            </div>
+          )}
+          <div style={{display:"flex",gap:8,alignItems:"flex-end",marginBottom:12}}>
+            <div style={{flex:1}}>
+              <label className="lbl">Quarter Label *</label>
+              <input value={newQ.label||""} onChange={e=>setNewQ(q=>({...q,label:e.target.value}))} placeholder="Q1 FY27" className="inp"/>
+            </div>
+            <button className="btn ghost sm" style={{whiteSpace:"nowrap",marginBottom:0,height:42,alignSelf:"flex-end"}}
+              onClick={()=>autoFillQuarter(newQ.label,sym)} disabled={autoFilling||!newQ.label}>
+              {autoFilling?"⏳":"🔍"} Refetch
+            </button>
+          </div>
+          <Field label="Date" k="date" ph="May 2026" s={newQ} ss={setNewQ}/>
+          <div className="grid2">
+            {[["Rev Est ($M)","rev_est","150"],["Rev Actual","rev_act",""],
+              ["EPS Est","eps_est","0.30"],["EPS Actual","eps_act",""],
+              ["AH Reaction","ah","+5%"],["48h Net","net","+3%"],
+              ["D+1 Open","d1o","~$30"],["D+1 Close","d1c","~$29"],
+              ["Metric 1 Label","m1l","NRR"],["Metric 1 Value","m1v","115%"],
+              ["Metric 2 Label","m2l","EBITDA Mgn"],["Metric 2 Value","m2v","55%"],
+              ["Metric 3 Label","m3l","Metric 3"],["Metric 3 Value","m3v",""],
+            ].map(([lbl,k,ph])=>(
+              <div key={k} className="field">
+                <label className="lbl">{lbl}</label>
+                <input value={newQ[k]||""} onChange={e=>setNewQ(q=>({...q,[k]:e.target.value}))} placeholder={ph} className="inp"/>
+              </div>
+            ))}
+          </div>
+          <AreaField label="Pre-Earnings Narrative" k="pre" ph="Can fill in later..." s={newQ} ss={setNewQ} optional/>
+          <AreaField label="What the Quarter Said"   k="said" ph="Can fill in later..." s={newQ} ss={setNewQ} optional/>
+          <AreaField label="Why Market Reacted"      k="why" ph="Can fill in later..." s={newQ} ss={setNewQ} optional/>
+          <AreaField label="Thesis Update"           k="upd" ph="Can fill in later..." s={newQ} ss={setNewQ} optional/>
+          <div className="row gap mt4">
+            <button className="btn ac f1" style={{fontWeight:700}} onClick={addQuarter}>Add Quarter</button>
+            <button className="btn ghost f1" onClick={()=>setModal(null)}>Cancel</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
