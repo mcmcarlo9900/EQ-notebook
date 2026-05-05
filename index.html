@@ -1093,6 +1093,194 @@ const AreaField=({label,k,ph,s,ss,optional})=>(
   </div>
 );
 
+// ─── RESEARCH REPORTS DATA ───────────────────────────────────────────
+const RESEARCH_REPORTS = [
+  {
+    ticker:"FIG", company:"Figma Inc.", sector:"Software", type:"Initiation",
+    date:"Mar 2026",
+    thesis:"Design platform with best-in-class NDR (136%) entering AI credit monetization inflection. Trades at discount to peers despite superior retention — NDR re-acceleration is the change-of-view signal.",
+    tags:["Long-biased","AI monetization","NDR re-accel"],
+    url:"reports/FIG.html"
+  },
+  {
+    ticker:"ADBE", company:"Adobe Inc.", sector:"Software", type:"Initiation",
+    date:"Apr 2026",
+    thesis:"Creative moat is bone not armor — correctness oracle advantage in regulated, brand-accountable workflows. Re-rating requires AI credit revenue visibly accelerating in reported results. CEO transition is the near-term risk.",
+    tags:["Neutral","AI risk/reward","Firefly monetization"],
+    url:"reports/ADBE.html"
+  },
+  {
+    ticker:"RKLB", company:"Rocket Lab Corp.", sector:"Aerospace & Defense", type:"Initiation",
+    date:"Apr 2026",
+    thesis:"Two structurally distinct businesses: assured-access launch (policy-protected, DoD needs a credible SpaceX alternative) + satellite systems prime contractor (SDA $816M contract = transition from vendor to defense prime). Neutron is the free option.",
+    tags:["Speculative long","Defense prime","Neutron optionality"],
+    url:"reports/RKLB.html"
+  },
+  {
+    ticker:"HIMS", company:"Hims & Hers Health Inc.", sector:"Digital Health", type:"Initiation",
+    date:"Apr 2026",
+    thesis:"DTC telehealth compounding growth via GLP-1 channel and subscription model. Key risk: FDA compounding policy reversal would remove the branded GLP-1 revenue contribution. The revenue sustainability question is unresolved.",
+    tags:["Long-biased","GLP-1 exposure","FDA regulatory risk"],
+    url:"reports/HIMS.html"
+  },
+  {
+    ticker:"WAY", company:"Waystar Holding Corp.", sector:"Healthcare IT", type:"Initiation",
+    date:"Apr 2026",
+    thesis:"Healthcare payments infrastructure with highly sticky enterprise contracts. 2.7x net leverage targeting 1 turn of annual deleveraging — Moody's and S&P credit upgrades in Q1 2026 validate the path to re-rating as a high-quality SaaS compounder.",
+    tags:["Long-biased","Deleveraging story","Healthcare SaaS"],
+    url:"reports/WAY.html"
+  },
+  {
+    ticker:"TEAM · MNDY · ASAN · ADBE · FIG", company:"Workflow Platform Comparative", sector:"Software", type:"Comparative",
+    date:"Apr 2026",
+    thesis:"Seven-law framework for AI workflow platform transition. Rankings by moat durability: ADBE #1 (correctness oracle), FIG #2 (irreplaceable design node), TEAM #3 (dev workflow depth), MNDY #4, ASAN #5. The platform transition thesis requires owning an irreplaceable node — most will fail.",
+    tags:["Comparative","AI disruption","Platform transition"],
+    url:"reports/workflow_comparative.html"
+  }
+];
+
+function ResearchPage({setView}){
+  const [expanded,setExpanded]=useState(null);
+  const [notes,setNotes]=useState(()=>{
+    try{return JSON.parse(localStorage.getItem("eq_research_notes")||"{}");}catch{return {};}
+  });
+  const [filter,setFilter]=useState("All");
+
+  const saveNote=(ticker,val)=>{
+    const u={...notes,[ticker]:val};
+    setNotes(u);
+    try{localStorage.setItem("eq_research_notes",JSON.stringify(u));}catch{}
+  };
+
+  const sectors=["All",...Array.from(new Set(RESEARCH_REPORTS.map(r=>r.sector)))];
+  const visible=filter==="All"?RESEARCH_REPORTS:RESEARCH_REPORTS.filter(r=>r.sector===filter);
+
+  return(
+    <div className="page">
+      {/* Top bar */}
+      <div className="top-bar sticky safe-top safe-x">
+        <div className="wrap" style={{paddingTop:10,paddingBottom:10}}>
+          <div className="row sb mb2">
+            <div className="row gap">
+              <button className="bc-back" onClick={()=>setView("dash")}>← Coverage</button>
+              <span className="bc-sep">/</span>
+              <span className="bc-sym">Research</span>
+            </div>
+            <span style={{fontSize:11,color:"var(--s5)",fontFamily:"ui-monospace,monospace",letterSpacing:".06em",textTransform:"uppercase"}}>
+              {RESEARCH_REPORTS.length} reports
+            </span>
+          </div>
+          <div style={{fontSize:12,color:"var(--s4)",marginBottom:10,lineHeight:1.5}}>
+            Initiation coverage · click a report to open the full research note
+          </div>
+          {/* Sector filter pills */}
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {sectors.map(s=>(
+              <button key={s} onClick={()=>setFilter(s)} style={{
+                fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:20,
+                border:filter===s?"1.5px solid var(--nv)":"1px solid var(--s6)",
+                background:filter===s?"var(--pl)":"#fff",
+                color:filter===s?"var(--nv)":"var(--s4)",
+                transition:".15s",letterSpacing:".04em",cursor:"pointer"
+              }}>{s}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Report list */}
+      <div className="wrap safe-x safe-bot" style={{padding:"16px 16px",paddingBottom:100}}>
+        <div className="stack">
+          {visible.map(r=>{
+            const isOpen=expanded===r.ticker;
+            const note=notes[r.ticker]||"";
+            return(
+              <div key={r.ticker} className="card" style={{borderLeft:"3px solid var(--br)"}}>
+                <div style={{padding:"12px 14px"}}>
+                  {/* Header row */}
+                  <div className="row sb" style={{marginBottom:6}}>
+                    <div className="row gap" style={{alignItems:"baseline",flexWrap:"wrap",gap:6}}>
+                      <span style={{fontFamily:"ui-monospace,monospace",fontWeight:800,fontSize:14,color:"var(--navy)",letterSpacing:".02em"}}>{r.ticker}</span>
+                      <span style={{fontSize:12,color:"var(--s4)",fontWeight:500}}>{r.company}</span>
+                    </div>
+                    <span style={{fontSize:11,color:"var(--s5)",fontFamily:"ui-monospace,monospace",whiteSpace:"nowrap",marginLeft:8}}>{r.date}</span>
+                  </div>
+
+                  {/* Type + sector badges */}
+                  <div style={{display:"flex",gap:5,marginBottom:8,flexWrap:"wrap"}}>
+                    <span style={{fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:5,
+                      background:"var(--navy)",color:"#93c5fd",letterSpacing:".06em",textTransform:"uppercase"}}>{r.type}</span>
+                    <span style={{fontSize:10,fontWeight:600,padding:"2px 7px",borderRadius:5,
+                      background:"var(--pl2)",color:"var(--mid)",border:"1px solid var(--pl)",letterSpacing:".04em"}}>{r.sector}</span>
+                  </div>
+
+                  {/* Thesis */}
+                  <div style={{fontSize:13,color:"var(--s3)",lineHeight:1.7,
+                    borderLeft:"2px solid var(--pl)",paddingLeft:10,marginBottom:10}}>
+                    {r.thesis}
+                  </div>
+
+                  {/* Tags */}
+                  <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
+                    {r.tags.map(t=>(
+                      <span key={t} style={{fontSize:10,padding:"2px 8px",borderRadius:10,
+                        background:"var(--surface2)",color:"var(--s4)",
+                        border:"1px solid var(--s6)",fontWeight:600}}>{t}</span>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="row gap">
+                    {r.url?(
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" style={{
+                        fontSize:12,fontWeight:700,padding:"7px 14px",borderRadius:8,
+                        background:"var(--nv)",color:"#fff",textDecoration:"none",
+                        letterSpacing:".02em",transition:".15s"}}>
+                        Open Report ↗
+                      </a>
+                    ):(
+                      <span style={{fontSize:12,fontWeight:600,padding:"7px 14px",borderRadius:8,
+                        background:"var(--surface2)",color:"var(--s5)",border:"1px solid var(--s6)"}}>
+                        Not uploaded yet
+                      </span>
+                    )}
+                    <button className="btn ghost sm" style={{marginLeft:"auto"}}
+                      onClick={()=>setExpanded(isOpen?null:r.ticker)}>
+                      {isOpen?"↑ Close":"✎ Notes"}
+                      {note&&!isOpen&&<span style={{marginLeft:5,width:6,height:6,borderRadius:"50%",
+                        background:"var(--br)",display:"inline-block",verticalAlign:"middle"}}/>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Notes panel */}
+                {isOpen&&(
+                  <div style={{borderTop:"1px solid var(--s6)",padding:"12px 14px",background:"var(--pl2)"}}>
+                    <div style={{fontSize:10,fontWeight:700,color:"var(--mid)",letterSpacing:".1em",
+                      textTransform:"uppercase",marginBottom:6}}>Research Notes</div>
+                    <textarea className="inp area" rows={5}
+                      placeholder="Thesis updates, catalyst triggers, position notes, change-of-view conditions..."
+                      value={note} onChange={e=>saveNote(r.ticker,e.target.value)}
+                      style={{fontSize:"13px",lineHeight:1.6,background:"#fff"}}/>
+                    <div style={{fontSize:10,color:"var(--s5)",marginTop:4}}>Auto-saved to this device</div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Upload instructions banner */}
+        <div style={{marginTop:20,padding:"12px 14px",borderRadius:10,
+          background:"var(--amber-bg)",border:"1px solid var(--amber-bd)",
+          fontSize:12,color:"var(--amber-t)",lineHeight:1.7}}>
+          <strong>To activate Open Report buttons:</strong> create a <code style={{fontSize:11}}>/reports/</code> folder in your GitHub repo and upload each HTML report file there (FIG.html, ADBE.html, RKLB.html, HIMS.html, WAY.html, workflow_comparative.html).
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App(){
   const [data,setData]=useState(null);
   const [view,setView]=useState("dash");
@@ -1459,6 +1647,9 @@ function App(){
   const ticker=sym?data.tickers[sym]:null;
   const ld=live[sym]||{};
 
+  /* RESEARCH PAGE */
+  if(view==="research")return(<ResearchPage setView={setView}/>);
+
   /* DASHBOARD */
   if(view==="dash")return(
     <div className="page">
@@ -1469,6 +1660,8 @@ function App(){
             <div className="brand-title">Coverage</div>
           </div>
           <div className="row gap" style={{alignItems:"flex-end",paddingBottom:2}}>
+            <button className="btn ghost sm" onClick={()=>setView("research")}
+              style={{fontSize:12,letterSpacing:".04em"}}>📄 Research</button>
             <button className="btn-icon" onClick={()=>setModal("settings")}>⚙</button>
             <span title={syncing?"Saving...":syncOk===false?"Sync error":"Saved to cloud"}
               style={{display:"inline-block",width:8,height:8,borderRadius:"50%",marginRight:4,
